@@ -1,0 +1,28 @@
+
+An implementation in C of Knuth's Dancing Links 
+approach to Algorithm X for the "exact cover" problem.
+
+Files:
+
+  README
+  Makefile            compilation script
+  test.c              sample problem
+  dancing_links.c     algorithm 
+  dancing_links.h     api
+
+Sample compilation and execution :
+
+  $ gcc -c dancing_links.c
+  $ gcc -c test.c
+  $ gcc test.o dancing_links.o -o test
+  $ ./test
+
+or using the Makefile, just :
+
+  $ make
+  $ ./test 
+
+Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
+This is open source software under the terms of the MIT License 
+as given at http://www.opensource.org/licenses/mit-license.php .
+
