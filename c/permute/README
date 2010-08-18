@@ -1,0 +1,17 @@
+
+ Johnson-Trotter permutation generator in C
+ based on http://www.dreamincode.net/code/snippet4203.htm
+
+ Files :
+   README
+   permute.h
+   permute.c
+   test.c
+
+ Compiling and running it :
+   $ make
+   $ ./test
+
+ Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
+ This is open source software under the terms of the MIT License 
+ as given at http://www.opensource.org/licenses/mit-license.php .
