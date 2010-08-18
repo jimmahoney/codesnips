@@ -1,0 +1,14 @@
+
+ N-queens problem in C
+
+ Requires ../permute/* permutation generator.
+
+ See ../diagonal_latin_squares/ for examples of using this.
+
+ Compiling and running it :
+   $ make
+   $ ./test
+
+ Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
+ This is open source software under the terms of the MIT License 
+ as given at http://www.opensource.org/licenses/mit-license.php .
