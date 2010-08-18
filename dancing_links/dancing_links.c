@@ -1,5 +1,5 @@
 /*
- * dancing_links.c    v1.0
+ * dancing_links.c    v1.01
  *
  * An implementation in C of Knuth's Dancing Links 
  * approach to Algorithm X for the "exact cover" problem.
@@ -71,7 +71,11 @@
 #include <stdlib.h>
 #include "dancing_links.h"
 
+// 1 for diagnostic printing
 #define DEBUG_PRINT 0
+
+// -1 for no printing; else print chosen row,col down to given search depth.
+#define PRINT_PROGRESS_DEPTH 1
 
 // The nodes fall into three categories :
 //   one      root node      horizontal links to headers
@@ -453,6 +457,28 @@ int finished(solutions ss){
   return ss->i_solns >= ss->max_solns;
 }
 
+void print_data(int* data, int Nrows, int Ncols){
+  int row, col;
+  printf("      ");
+  for (col = 0; col < Ncols; col++) printf("%3i", col);
+  printf("\n");
+  printf("     +");
+  for (col = 0; col < Ncols; col++) printf("---");
+  printf("\n");
+  for (row = 0; row < Nrows; row++){
+    printf(" %3i | ", row);
+    for (col = 0; col < Ncols; col++){
+      if (*(data + row*Ncols + col)){
+	printf(" 1 ");
+      }
+      else {
+	printf(" 0 ");
+      }
+    }
+    printf("\n");
+  }
+}
+
 void print_grid(node root){
   // print a grid as a matrix of 1's and 0's, e.g.
   //          0    1    2 
@@ -467,12 +493,12 @@ void print_grid(node root){
   col_count = 0;
   printf("      ");
   for (h = root->right; h != root; h = h->right){
-    printf(" %3i ", h->col);
+    printf("%3i", h->col);
     col_count++;
   }
   printf("\n");
   printf("     +");
-  for (i=0; i < col_count; i++) printf("-----");
+  for (i=0; i < col_count; i++) printf("---");
   printf("\n");
   for (row=0; row < root->row; row++){
     one_in_row = 0;
@@ -487,11 +513,11 @@ void print_grid(node root){
 	is_one = 0;
 	for (n = h->down; n != h; n = n->down){
 	  if (n->row == row){
-	    printf("  1  ");
+	    printf(" 1 ");
 	    is_one = 1;
 	  }
 	}
-	if (! is_one) printf("  0  ");
+	if (! is_one) printf(" 0 ");
       }
       printf("\n");
     }
@@ -535,12 +561,16 @@ void grid_analysis(node root){
   printf("  1s in grid = %i \n", in_grid);
 }
 
-void search(node root, solutions ss){
+void search(node root, solutions ss, int depth){
   solution s;
   node n, column;
   int i, i_solns, solution_row_index;
+  if (PRINT_PROGRESS_DEPTH >=0 && depth == 0){
+    printf(" - dancing links search - printing (col, row) to depth %i - \n",
+	   PRINT_PROGRESS_DEPTH);
+  }
   if (DEBUG_PRINT){
-    printf(" -- search --\n");
+    printf(" -- searching at depth=%i --\n", depth);
     print_grid(root);
     fflush(stdout);
   }
@@ -569,7 +599,14 @@ void search(node root, solutions ss){
     // For each remaining row in that column,
     // while we're still searching for solutions :
     while (n != column && ! finished(ss)){
-      if (DEBUG_PRINT) print_node("    -- trying node ", n);
+      // if (DEBUG_PRINT) print_node("    -- trying node ", n);
+      if (depth <= PRINT_PROGRESS_DEPTH) {
+	printf("    ");
+	for (i=0; i<depth; i++) printf("  ");
+	printf("(%i, %i)", n->col, n->row);
+	if (depth == PRINT_PROGRESS_DEPTH) printf(" ... ");
+	printf("\n");
+      }
       // Push the row to the current partial solution.
       s = ss->solns[ss->i_solns];
       s->rows[s->i_rows] = n->row;
@@ -577,8 +614,9 @@ void search(node root, solutions ss){
       // Remove the selected node from the grid,
       // as well as its row, conflicting rows and satisfied colums.
       reduce_grid(n);
+      // progress report
       // Recursively search the smaller grid.
-      search(root, ss);
+      search(root, ss, depth+1);
       // Reverse the grid removals,
       undo_reduce_grid(n);
       // Pull the row from the partial solution.
@@ -627,7 +665,7 @@ void test_search(){
   solutions solns;
   printf(" -- testing search --\n");
   solns = new_solutions(10, 10);
-  search(root, solns);
+  search(root, solns, 0);
   print_solutions(solns);
 }
 
@@ -646,7 +684,7 @@ solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns){
 
   solns = new_solutions(max_solns, n_rows);  
   root = new_grid(n_rows, n_cols, data);
-  search(root, solns);
+  search(root, solns, 0);
   free_all_nodes();
   return solns;
 }

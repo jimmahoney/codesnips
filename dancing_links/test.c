@@ -1,5 +1,5 @@
 /*
- * test.c    v1.0
+ * test.c    v1.01
  *
  * Three test cases for dancing_links.h and dancing_links.c .
  * 
@@ -58,27 +58,6 @@ int data1[n_rows][n_cols] = { {1, 0, 0, 1, 0, 0, 1},
  */
 int data2[] = {1,1,0,  1,0,1,  0,1,0,  0,0,1};  // nrows=4, ncols=3
 
-void print_data(int* data, int Nrows, int Ncols){
-  int row, col;
-  printf("      ");
-  for (col = 0; col < Ncols; col++) printf(" %3i ", col);
-  printf("\n");
-  printf("     +");
-  for (col = 0; col < Ncols; col++) printf("-----");
-  printf("\n");
-  for (row = 0; row < Nrows; row++){
-    printf(" %3i | ", row);
-    for (col = 0; col < Ncols; col++){
-      if (*(data + row*Ncols + col)){
-	printf("  1  ");
-      }
-      else {
-	printf("  0  ");
-      }
-    }
-    printf("\n");
-  }
-}
 
 int main(){
   solutions s;

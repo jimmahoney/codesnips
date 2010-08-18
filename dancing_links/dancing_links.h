@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 /*
- * dancing_links.h    v1.0
+ * dancing_links.h    v1.01
  *
  * An interface to a dancing links implementation.
  *
@@ -47,5 +47,8 @@ solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns);
 // Prints total number of solitions found,
 // and one line of row indices for each solution.
 void print_solutions(solutions s);
+
+// Print matrix of 1's and 0'2 from data[n_rows][n_cols]
+void print_data(int* data, int Nrows, int Ncols);
 
 #endif
