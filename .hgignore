@@ -1,0 +1,8 @@
+
+syntax: glob
+*.o
+c/dancing_links/test
+c/n_queens/test
+c/permute/test
+c/diagonal_latin_square/dls
+

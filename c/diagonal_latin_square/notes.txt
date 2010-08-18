@@ -1,0 +1,74 @@
+Diagonal Latin Square 
+
+ From Puzzle Corner in July/Aug Techology Review :
+   Find an 8x8 grid of the numbers 1 to 8 such that
+   there are no duplicates in same row, column, or diagonal.
+   (Diagonals don't wrap.)
+
+Each digit satisfies the classic "8-queens" problem,
+so one way to do this is to find eight of these 
+solutions (one for each digit) that don't overlap.
+
+Running the C code in this directory shows that there 
+are 92 solutions to the 8-queens problem.
+
+If all are laid on top of each other, here are how many
+queens there are in each cell:
+
+    4    8   16   18   18   16    8    4
+    8   16   14    8    8   14   16    8
+   16   14    4   12   12    4   14   16
+   18    8   12    8    8   12    8   18
+   18    8   12    8    8   12    8   18
+   16   14    4   12   12    4   14   16
+    8   16   14    8    8   14   16    8
+    4    8   16   18   18   16    8    4
+
+The product of these along any row or main diagonal
+gives one limit on a brute-force search.
+
+Looks like the diagonal is the smallest :
+ 4 * 16 * 4 * 8 * 8 * 4 * 16 * 4 = 4194304 ~ 4.2e6
+which seems like a searchable size.
+
+In fact, the diagonal numbers imply that we must
+choose our subset of n-queens solutions from among
+fewer than the 92, since (unlike the n-queens)
+there must be one of each digit along the main
+diagonal.  Thus we need only consider the solutions
+that include a number on the diagonal, which are 
+(4 + 16 + 4 + 8 + 8 + 4 + 16 + 4) = 64.
+
+And we have two diagonals.  Are they the same 64?
+We need consider only the intersection of those two sets,
+which contain 48 solutions.
+
+I don't see a clever way to reduce the problem further
+without searching.  Brute force requires looking 
+at C(48, 8) = choose 8 from 48 = 48*47*...*41 
+= 15214711438080 = 1.5e13, which is pretty big.
+
+This looks like a prime candidate for the Dancing Links
+version of Knuth's Algorith X, which solves the exact 
+cover problem :
+
+ * The exact cover matrix will be 48 x 64 matrix , namely
+
+                  0,0  0,1  0,2 ... 7,7  = row,col on 8x8 board
+    solution  1     *    *    * ...   *
+    solution  2     *    *    * ...   *
+    solution  3   ...
+     ...          ...
+    solution 48   ...
+
+ * Each column is one of the 64 squares in the 8x8 grid.
+ * Each row is one of the 48 n-queens solutions that have
+   a queen in each main diagonal.
+ * Put a 1 where a given permuation has a queen in that 
+   square, and a 0 where it doesn't; therefore there are 
+   eight 1's in each row.
+
+Then the "exact cover" problem is to find a subset of the rows
+such that there is a single 1 in each column.  That subset will 
+be the eight solutions that we want.
+

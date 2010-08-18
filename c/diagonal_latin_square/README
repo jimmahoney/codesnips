@@ -1,0 +1,22 @@
+
+Diagonal Latin Square 
+
+ See ./notes.txt for a discussion of the problem.
+
+ The code is in this directory and several nearby :
+   ./dls.c                     diagonal latin square in C
+   ../permute/*                permutation generator
+   ../n_queens/*               N-queens on an NxN board code
+   ../dancing_links/*          Knuth's exact cover algorithm
+
+ To compile and run it :
+   1. First run "make" in each of the 
+      directories (permute, n_queens, dancing_links)
+      to create permute.o, n_queens.o, dancing_links.o .
+   2. Then in this directory :
+        $ make
+        $ ./dls
+
+Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
+This is open source software under the terms of the MIT License 
+as given at http://www.opensource.org/licenses/mit-license.php .
