@@ -451,6 +451,15 @@ sub play_game {
 
 # ==== theory of two player game searching ======================
 #
+# The Min/Max and Alpha/Beta search algorithm I describe below
+# have been around for a long time; a google search will find
+# many sources; see for example wikipedia's 'Alpha-beta pruning.  
+#
+# But I'm going to summarize anyway.  
+#
+# Some what follows is based on a discussion by Bruce Moreland
+# as found at http://www.seanet.com/~brucemo/topics/topics.htm.
+#
 # Think of the board positions as a tree, with the current position
 # as the root of the tree, and the branches as possible moves.
 # 
@@ -583,12 +592,11 @@ sub play_game {
 #   return $alpha;
 # }
 #
-#
+# (whew!)
 
-#
 # === code for min/max search and alpha/beta pruning =================
 #
-# Several pieces have been added to the discussion above, including
+# All right, several pieces have been added to the discussion above, including
 #  * the return of the best move as well as the board value,
 #  * a version that stores the best moves rather than repeat the search, and
 #  * various ways to summarize the results.
@@ -740,7 +748,7 @@ sub alphabeta {
   for my $move (@legal_moves){
     do_move($move);
     ($value) = alphabeta(-$beta, -$alpha);    # Recursive search
-    $value = -$value;                         # other players perspective
+    $value = -$value;                         # other player's perspective
     undo_move();
     if ($value >= $beta){
       return ($beta, $move);
