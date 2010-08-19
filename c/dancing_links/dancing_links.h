@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 /*
- * dancing_links.h    v1.01
+ * dancing_links.h    v1.02
  *
  * An interface to a dancing links implementation.
  *

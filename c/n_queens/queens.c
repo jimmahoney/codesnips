@@ -171,6 +171,17 @@ void print_boards(boards bs){
   }
 }
 
+board nth_board(boards bs, int n){
+  // return n'th board from list
+  board b = bs->first;
+  int i = 0;
+  while (i < n){
+    b = b->next;
+    i++;
+  }
+  return b;
+}
+
 void print_board_as_perm(board b){
   int i;
   int n = b->n;
@@ -183,9 +194,12 @@ void print_board_as_perm(board b){
 
 void print_boards_as_perms(boards bs){
   board b = bs->first;
+  int i = 0;
   while (b != NULL){
+    printf(" %3i ", i);
     print_board_as_perm(b);
     b = b->next;
+    i++;
   }
 }
 

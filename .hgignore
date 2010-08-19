@@ -5,4 +5,4 @@ c/dancing_links/test
 c/n_queens/test
 c/permute/test
 c/diagonal_latin_square/dls
-
+c/diagonal_latin_square/n_dls

@@ -79,7 +79,151 @@ leads to matrix which has all zeros in one of the columns.
 
 So unless I've made a mistake, there isn't a solution.
 
+A closer look at where things break down :
+
+ At (row,col = 0,1), there are only 3 8-queen solutions
+ with queens on the diagonal; that's the column that
+ the dlx algorithm chose to work through first.
+
+ The solutions are 
+   # 31 : [1,6,2,5,7,4,0,3]
+   # 34 : [1,3,5,7,2,0,6,4]
+   # 47 : [1,7,5,0,2,4,6,3]
+
+ Let's look first at # 31,
+   # 31 : [1,6,2,5,7,4,0,3]
+ In that case, the dancing links reduction finds all 
+ zeros in matrix column 33, which is queens row=4, col=1 (4*8+1)
+ That board cell has a queen in four solutions, 
+ and each has a conflict with solution # 31.
+   # 31 : [1,6,2,5,7,4,0,3] and one of the following?  No.
+   ------------------------
+   #  1 : [0,6,4,7,1,3,5,2]      row 1, col 6 conflict
+   #  3 : [4,6,0,3,1,7,5,2]      row 1, col 6 conflict
+   # 14 : [7,2,0,5,1,4,6,3]      row 7, col 3 conflict
+   # 24 : [3,6,2,7,1,4,0,5]      row 1, col 6 conflict
+
+ Now 34.  In that case, matrix column 8, i.e. (row 1, col 0) 
+ is the conflict.  There are three solutions with a queen there.
+   # 34 : [1,3,5,7,2,0,6,4] and one of the following?  No.
+   ------------------------
+   #  0 : [5,0,4,1,7,2,6,3]      row 7, col 6 conflict
+   # 10 : [6,0,2,7,5,3,1,4]      row 3, col 7 conflict
+   #  8 : [3,0,4,7,5,2,6,1]      row 7, col 6 conflict
+
+ Last one to check is 47.  Then column 11, i.e. (row 1, col 3) is zeros.
+   # 47 : [1,7,5,0,2,4,6,3] and one of the following?  Nope. 
+   -----------------------
+   #  4 : [5,3,0,4,7,1,6,2]      row 7, col 6 conflict
+   #  6 : [7,3,0,2,5,1,6,4]      row 7, col 6 conflict
+   #  7 : [5,3,6,0,2,4,1,7]      row 3, col 0 conflict
+   # 34 : [1,3,5,7,2,0,6,4]      row 7, col 6 conflict
+
+So I can confirm by hand that there's no solution.  Sigh.
+
+------------------------------------------------------------
+
+What happens for other values of n besides 8?
+
+ # This much runs pretty quickly; I haven't waited for n=12 to finish.
+
+thirty-two:diagonal_latin_square$ ./n_dls
+ n=3 nqueens=0 
+ n=4 nqueens=2 
+ n=5 nqueens=10 diags=10 solns=2 
+
+  +-----------+
+  | A B C D E |   1st of 2 n=5 solutions
+  | C D E A B |
+  | E A B C D |
+  | B C D E A |
+  | D E A B C |
+  +-----------+
 
 
+ n=6 nqueens=4 
+ n=7 nqueens=40 diags=38 solns=4 
+
+  +---------------+
+  | A C B D E F G | 1st of 4 n=7 solutions
+  | D E F G A C B |
+  | G A C B D E F |
+  | B D E F G A C |
+  | F G A C B D E |
+  | C B D E F G A |
+  | E F G A C B D |
+  +---------------+
+
+
+ n=8 nqueens=92 diags=86 solns=0 
+ n=9 nqueens=352 diags=232 solns=0 
+ n=10 nqueens=724 diags=544 solns=0 
+ n=11 nqueens=2680 diags=1744 solns=8 
+
+  +-----------------------+
+  | A F E D H B G I J K C |
+  | B G I J K C A F E D H | 1st of 8 n=11 solutions
+  | C A F E D H B G I J K |
+  | H B G I J K C A F E D |
+  | K C A F E D H B G I J |
+  | D H B G I J K C A F E |
+  | J K C A F E D H B G I |
+  | E D H B G I J K C A F |
+  | I J K C A F E D H B G |
+  | F E D H B G I J K C A |
+  | G I J K C A F E D H B |
+  +-----------------------+
+
+Hmm.  I'm sure I shouldn't read too much into this pattern.
+But the solutions up through 11 are
+
+    n     count
+   --     -----
+    5         2
+    7         4
+   11         8
+    ?         ?
+
+The n=11 case is solving the exact cover problem
+on a 1744 by 64 matrix, looking for 11 row solutions.
+Before pruning, that's choose(1744, 11) which is a huge number.
+
+Probably for those bigger cases it'd be better to set 
+up the original problem as an exact cover, without the 
+n-queens sub-problem.  
+
+I think that'd require, though, that the dancing_links 
+implementation have "partial constraints" for the diagonals,
+as described briefly in wikipedia's "Dancing Links" article.
+The idea is to have primary and secondary columns, where
+the primary columns are the same as in the pure exact cover
+problem (must have exactly one 1), but the secondary columns
+may have zero or one 1.  I believe that would mean :
+ (a) It's not a dead-end when a secondary column is all zeros.
+ (b) A solution doesn't need no columns, just no primary ones.
+I think that means the choose_column would only pick primary columns.
+But otherwise the reduction would include secondary columns,
+to include their constraints.
+
+The whole matrix would have 
+ * n**3 rows (which symbol in which row, col)
+ * 2*n primary columns (colum, row constraints)  
+ * 2 more primaries for the main diagonals
+ * 4*(n-2) secondary columns (other diagonals)
+And from that, n**2 rows must be chosen for a solution.
+
+For n=13, that's 2197 rows ... maybe not much better than what I'm doing now.
+
+Trying n=12 ...
+
+ # with low=high=12
+ thirty-two:diagonal_latin_square$ time ./n_dls
+ n=12 nqueens=14200 diags=9440 Segmentation fault
+ real	2m2.989s
+ user	2m2.817s
+ sys	0m0.061s
+ 
+Maybe it couldn't allocate enough memory?
+I'm not quitting cleanly right now when that happens ... another thing to fix.
 
 

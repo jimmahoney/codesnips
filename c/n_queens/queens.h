@@ -49,6 +49,7 @@ int is_queen(board b, int row, int column);
 board new_board(int n);
 board new_board_from_queens(int n, int* queens);
 boards new_boards();
+board nth_board(boards bs, int n);
 
 void print_board(board b);
 void print_board_as_perm(board b);

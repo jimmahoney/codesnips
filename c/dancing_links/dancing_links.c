@@ -1,5 +1,5 @@
 /*
- * dancing_links.c    v1.01
+ * dancing_links.c    v1.02
  *
  * An implementation in C of Knuth's Dancing Links 
  * approach to Algorithm X for the "exact cover" problem.
@@ -67,15 +67,20 @@
  *
  */
 
+// FIXME : memory issues: 
+//  1. all the mallocs should fail gracefully if too much memory is requested.
+//  2. something wrong with free_nodes ... 
+//  3. need a routine to free returned answeers.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "dancing_links.h"
 
 // 1 for diagnostic printing
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 
 // -1 for no printing; else print chosen row,col down to given search depth.
-#define PRINT_PROGRESS_DEPTH 3
+#define PRINT_PROGRESS_DEPTH -1
 
 // The nodes fall into three categories :
 //   one      root node      horizontal links to headers
@@ -162,6 +167,7 @@ void free_node(node n){
   node_list_count--;
   free(n);
 }
+
 void free_all_nodes(){
   node n = node_list_head;
   node next;
@@ -169,10 +175,17 @@ void free_all_nodes(){
     next = n->next;
     // printf(" node count is now %i\n", node_list_count);
     // print_node_prevnext("  free", n);
-    free_node(n);
+    //
+    // free_node(n);   // FIXME
+    //   sometimes I'm getting this error :
+    //   malloc: *** error for object 0x100105540: 
+    //   incorrect checksum for freed object - object was probably modified after being freed.
+    //   At the moment I'm just not freeing up the node memory on exit...
+    //
     n = next;
   }
 }
+
 void test_node_list(){
   node a, b, c, d;
   printf("  -- testing node list --\n");
@@ -690,6 +703,6 @@ solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns){
   solns = new_solutions(max_solns, n_rows);  
   root = new_grid(n_rows, n_cols, data);
   search(root, solns, 0);
-  free_all_nodes();
+  free_all_nodes(); 
   return solns;
 }
