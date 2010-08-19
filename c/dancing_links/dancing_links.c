@@ -69,7 +69,7 @@
 
 // FIXME : memory issues: 
 //  1. all the mallocs should fail gracefully if too much memory is requested.
-//  2. something wrong with free_nodes ... 
+//  2. something wrong with free_nodes ... I've just commented out all free()'s (yuch)
 //  3. need a routine to free returned answeers.
 
 #include <stdio.h>
@@ -147,7 +147,7 @@ void free_node(node n){
     node_list_head = NULL;
     node_list_tail = NULL;
     node_list_count = 0;
-    free(n);
+    // free(n);
     return;
   }
   if (prev == NULL){
@@ -165,7 +165,7 @@ void free_node(node n){
     next->prev = prev;
   }
   node_list_count--;
-  free(n);
+  //free(n);
 }
 
 void free_all_nodes(){

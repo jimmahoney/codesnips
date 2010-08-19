@@ -113,8 +113,11 @@ int main() {
       if (diags->count > n){
 	n_diags_cols = pow(diags->first->n, 2);
 	n_diags_rows = diags->count;
+
 	matrix = make_matrix(diags);
+	// printf("\n === enter dancing_links == \n"); fflush(stdout);
 	answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
+	// printf(" === leave dancing_links ==\n"); fflush(stdout);
 	printf("solns=%i ", answer->i_solns);  fflush(stdout);
 	if (answer->i_solns > 0){
 	  //print_answer_perm(answer, diags, 0);
@@ -124,6 +127,14 @@ int main() {
       }
     }
     printf("\n");  fflush(stdout);
+    //free(matrix);
+    //free(solns);
+    //free(diags);
+    //free(answer);
+    //matrix = (int*) NULL;
+    //solns = (boards) NULL;
+    //diags = (boards) NULL;
+    //answer = (solutions) NULL;
   }
   return 0;
 }

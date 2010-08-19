@@ -155,7 +155,7 @@ thirty-two:diagonal_latin_square$ ./n_dls
   +---------------+
 
 
- n=8 nqueens=92 diags=86 solns=0 
+ n=8 nqueens=92 diags=48 solns=0 
  n=9 nqueens=352 diags=232 solns=0 
  n=10 nqueens=724 diags=544 solns=0 
  n=11 nqueens=2680 diags=1744 solns=8 
@@ -225,5 +225,9 @@ Trying n=12 ...
  
 Maybe it couldn't allocate enough memory?
 I'm not quitting cleanly right now when that happens ... another thing to fix.
+Something wrong with the freeing memory I'm doing in dancing_links.c;
+for now I've just done the kludgey thing of not freeing any memory.  (Ugh.)
+
+
 
 
