@@ -72,3 +72,14 @@ Then the "exact cover" problem is to find a subset of the rows
 such that there is a single 1 in each column.  That subset will 
 be the eight solutions that we want.
 
+... and it fails right away.  
+The (row=0, col=1) cell only has three solutions; 
+doing the dancing links reduction on each of those
+leads to matrix which has all zeros in one of the columns.
+
+So unless I've made a mistake, there isn't a solution.
+
+
+
+
+

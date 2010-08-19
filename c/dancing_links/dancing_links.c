@@ -72,10 +72,10 @@
 #include "dancing_links.h"
 
 // 1 for diagnostic printing
-#define DEBUG_PRINT 0
+#define DEBUG_PRINT 1
 
 // -1 for no printing; else print chosen row,col down to given search depth.
-#define PRINT_PROGRESS_DEPTH 1
+#define PRINT_PROGRESS_DEPTH 3
 
 // The nodes fall into three categories :
 //   one      root node      horizontal links to headers
@@ -587,7 +587,12 @@ void search(node root, solutions ss, int depth){
     // This is the heart of algorithm : 
     // First, choose a column.
     column = choose_column(root);
-    if (column->headcount == 0) return;  // current matrix can't be solved
+    if (column->headcount == 0){
+      if (DEBUG_PRINT){
+	printf(" -- column %i is all zero; this is a dead end.\n", column->col);
+      }
+      return;  // current matrix can't be solved
+    }
     if (DEBUG_PRINT){
       printf("    -- chose column %i \n", column->col);
       fflush(stdout);
