@@ -7,6 +7,58 @@
    $ make
    $ ./test
 
+   ==== print_board(good_board) ====
+      .  .  .  .  Q  .  .  . 
+      .  Q  .  .  .  .  .  . 
+      .  .  .  Q  .  .  .  . 
+      .  .  .  .  .  Q  .  . 
+      .  .  .  .  .  .  .  Q 
+      .  .  Q  .  .  .  .  . 
+      Q  .  .  .  .  .  .  . 
+      .  .  .  .  .  .  Q  . 
+   
+   ==== valid_diagonals ====
+    good board : 1 
+    bad board  : 0 
+   ==== small n behavior ====
+    n=0 :  none
+    n=1 :    0  [0]
+    n=2 :  none
+    n=3 :  none
+   ==== queens_search n=4 ====
+   2 boards :
+    ==
+      .  .  Q  . 
+      Q  .  .  . 
+      .  .  .  Q 
+      .  Q  .  . 
+   
+    ==
+      .  Q  .  . 
+      .  .  .  Q 
+      Q  .  .  . 
+      .  .  Q  . 
+   
+   ==== search n=8 ====
+    number of solutions = 92 
+    number of queens_search_diagonals = 48 
+    number of in_both_diagonals = 48 
+   ==== queens_search_diagonals for various n ====
+    n =  4 ; count =     0 ; time = 00:00:00.000
+    n =  5 ; count =    10 ; time = 00:00:00.000
+    n =  6 ; count =     0 ; time = 00:00:00.000
+    n =  7 ; count =    32 ; time = 00:00:00.001
+    n =  8 ; count =    48 ; time = 00:00:00.007
+    n =  9 ; count =   232 ; time = 00:00:00.073
+    n = 10 ; count =   544 ; time = 00:00:00.776
+
+ After editing test.c's source to change n and extrapolating/guessing :
+    n = 11 ; count =  1744 ; time = 00:00:09.314
+    n = 12 ; count =  9440 ; time = 00:02:01.546
+    n = 13 ; count = 52008 ; time = 00:29:49.561 ; 52k*13*(4 bytes) = 2.7MB
+    n = 14                   estimate about 7 hours (*14) ~ 40MB
+    n = 15                   estimate about 4 days (*15) ~ 600MB
+
  Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
  This is open source software under the terms of the MIT License 
  as given at http://www.opensource.org/licenses/mit-license.php .

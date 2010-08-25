@@ -1,6 +1,8 @@
-
 /*
- * Run tests
+ * test.c
+ *
+ * Some tests for the n_queens problem.
+ * See ./queens.h and ./README for details.
  *
  * == queens_search_diagonals timing ====
  *   n = 10 ; count =   544 ; time = 00:00:00.773
@@ -10,7 +12,7 @@
  *   n = 14                   estimate about 7 hours (*14) ~ 40MB
  *   n = 15                   estimate about 4 days (*15) ~ 600MB
  *
- * (Times are on 2.66GHz Intel Core i7 running Mac OS X 10.6.4, Aug 2010.)
+ * Times are with 2.66GHz Intel Core i7 running Mac OS X 10.6.4 on Aug 2010.
  */ 
 
 #include <stdio.h>
@@ -68,8 +70,6 @@ int main() {
   printf(" number of in_both_diagonals = %i \n", diagonals->count);
 
   printf("==== queens_search_diagonals for various n ====\n", n);
-  // n=13 takes about 30 min on my MacPro laptop; Aug 2010
-  
   for (n=4; n<11; n++){
     start_timer();
     free_boards(diagonals);
