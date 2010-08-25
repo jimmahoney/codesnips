@@ -5,6 +5,8 @@
 
 void permute(int n, void (*func)()) {
   int *array, *dir, tmp, tmp2, i, max;
+  if (n < 1) 
+    return;
   array = (int*)malloc(sizeof(int) * n);
   dir = (int*)calloc(n, sizeof(int));
   for (i = 0; i < n; i++)

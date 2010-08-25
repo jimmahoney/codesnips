@@ -1,0 +1,27 @@
+
+gcc -I/opt/local/include -I../permute -L/opt/local/lib -O0 -g3 -c test.c
+gcc -I/opt/local/include -I../permute -L/opt/local/lib -O0 -g3 -c queens.c
+gcc -I/opt/local/include -I../permute -L/opt/local/lib -O0 -g3 permute.o queens.o test.o -o test
+gdb test
+
+# See http://heather.cs.ucdavis.edu/~matloff/UnixAndC/CLanguage/Debug.html
+#
+# With the compilation as above, the variables and functions from 
+# queens.c and test.c are all stored in the 'text' executable, and so
+# the debugger will show the C source (or assembly) from either *.c file.
+#
+# (gdb) break main    # or just "b main"
+# Breakpoint 1 at 0x100000c44: file test.c, line 10.
+# (gdb) run           # or just "r"
+# 10	  int good_queens[] = {4, 1, 3, 5, 7, 2, 0, 6};
+# (gdb) step          # or just "s"
+# (gdb) list          # or just "l" "l file.c:52" 
+# (bdb) disp NC       # display value of NC each time program pauses
+#
+# or run in GUI ddd :
+#  $ ddd ./test
+# Click in "View" menu parts of pane you want;
+# may need to drag right toggles to see 'em :
+#  - display variables
+#  - source (with breakpoints)
+#  - gdb / console

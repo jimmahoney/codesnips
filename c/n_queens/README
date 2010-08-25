@@ -3,8 +3,6 @@
 
  Requires ../permute/* permutation generator.
 
- See ../diagonal_latin_squares/ for examples of using this.
-
  Compiling and running it :
    $ make
    $ ./test

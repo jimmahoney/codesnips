@@ -1,5 +1,5 @@
 /*
- * test.c    v1.01
+ * test.c
  *
  * Three test cases for dancing_links.h and dancing_links.c .
  * 

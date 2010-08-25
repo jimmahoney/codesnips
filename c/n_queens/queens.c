@@ -1,5 +1,5 @@
 /*
- *  See queens.h
+ *  See queens.h 
  */
 
 #include <stdio.h>
@@ -23,6 +23,11 @@ board new_board(int n){
   b->queens = queens;
   b->next = NULL;
   return b;
+}
+void free_board(board b){
+  if (b==NULL) return;
+  free(b->queens);
+  free(b);
 }
 
 // void queens2int(board b){
@@ -48,6 +53,17 @@ boards new_boards(){
   bs->first = NULL;
   bs->last = NULL;
   return bs;
+}
+void free_boards(boards bs){
+  board next;
+  if (bs == NULL) return;
+  board b = bs->first;
+  while (b != NULL){
+    next = b->next;
+    free_board(b);
+    b = next;
+  }
+  free(bs);
 }
 
 void append(boards bs, int n, int* queens){
@@ -106,41 +122,35 @@ int valid_diagonals(int n, int* queens){
   return 1;
 }
 
+int queen_in_1st_diagonal(int n, int* queens){
+  /* return true if this board has a queen in the \ main diagonal */
+  int col;
+  for (col = 0; col < n; col++){
+    if (queen_at(queens, col, col)) return 1;
+  }
+  return 0;
+}
+int queen_in_2nd_diagonal(int n, int* queens){
+  /* return true if this board has a queen in the / secondary diagonal */
+  int col;
+  for (col = 0; col < n; col++){
+    if (queen_at(queens, col, n-col-1)) return 1;
+  }
+  return 0;
+}
 boards in_both_diagonals(boards solutions){
+  // given a list of boards, return the subset with queens in both diagonals */
   boards diags = new_boards();
-  int* in_diag1;
-  int* in_diag2;
-  board b;
-  int col, i, j_soln;
-  int n = solutions->first->n;
-  in_diag1 = (int*) malloc(sizeof(int) * solutions->count);
-  in_diag2 = (int*) malloc(sizeof(int) * solutions->count);
-  for (i=0; i < n; i++){
-    in_diag1[i] = 0;
-    in_diag2[i] = 0;
-  }
-  for (col=0; col < n; col++){
-    b = solutions->first;
-    j_soln = 0;
-    while (b != NULL){
-      if (is_queen(b, col, col)) in_diag1[j_soln] = 1;
-      if (is_queen(b, n-col-1, col)) in_diag2[j_soln] = 1;
-      b = b->next;
-      j_soln++;
-    }
-  }
-  b = solutions->first;
-  j_soln = 0;
+  board b = solutions->first;
+  int n = b->n;
   while (b != NULL){
-    if (in_diag1[j_soln] && in_diag2[j_soln]) append(diags, b->n, b->queens);
+    if (queen_in_1st_diagonal(b->n, b->queens) && 
+	queen_in_2nd_diagonal(b->n, b->queens))
+      append(diags, n, b->queens);
     b = b->next;
-    j_soln++;
   }
-  free(in_diag1);
-  free(in_diag2);
   return diags;
 }
-
 
 void print_board(board b){
   int row, column;
@@ -159,20 +169,26 @@ void print_board(board b){
 }
 
 void print_boards(boards bs){
-  board b;
-  printf("%i boards :\n", bs->count);
-  if (bs->count > 0){
-    b = bs->first;
-    while (b != NULL){
-      printf(" ==\n");
-      print_board(b);
-      b = b->next;
+  if (bs->count == 0){
+    printf(" none\n");
+  }
+  else {
+    board b;
+    printf("%i boards :\n", bs->count);
+    if (bs->count > 0){
+      b = bs->first;
+      while (b != NULL){
+	printf(" ==\n");
+	print_board(b);
+	b = b->next;
+      }
     }
   }
 }
 
 board nth_board(boards bs, int n){
   // return n'th board from list
+  if (bs->count == 0) return (board) NULL;
   board b = bs->first;
   int i = 0;
   while (i < n){
@@ -193,24 +209,18 @@ void print_board_as_perm(board b){
 }
 
 void print_boards_as_perms(boards bs){
-  board b = bs->first;
-  int i = 0;
-  while (b != NULL){
-    printf(" %3i ", i);
-    print_board_as_perm(b);
-    b = b->next;
-    i++;
+  if (bs->count == 0){
+    printf(" none\n");
   }
-}
-
-boards solutions;
-int n_permutations;
-void check_permutation(int n, int* queens){
-  n_permutations++;
-  // printf(" . %i . \n", n_checked);
-  if (valid_diagonals(n, queens)) {
-    // printf(" solution found \n");
-    append(solutions, n, queens);
+  else {
+    int i = 0;
+    board b = bs->first;
+    while (b != NULL){
+      printf(" %3i ", i);
+      print_board_as_perm(b);
+      b = b->next;
+      i++;
+    }
   }
 }
 
@@ -243,10 +253,43 @@ void print_queens_per_square(boards solutions){
   }
 }
 
+// --- The routines below share these variables.
+
+boards solutions;
+int n_permutations;
+
+void queens_permutation(int n, int* queens){
+  // callback routine for permute()
+  n_permutations++;
+  // printf(" . %i . \n", n_checked);
+  if (valid_diagonals(n, queens)) {
+    // printf(" solution found \n");
+    append(solutions, n, queens);
+  }
+}
+
+void queens_diagonal_permutation(int n, int* queens){
+  // another callback routine for permute()
+  n_permutations++;
+  if (valid_diagonals(n, queens) && 
+      queen_in_1st_diagonal(n, queens) &&
+      queen_in_2nd_diagonal(n, queens)){
+    append(solutions, n, queens);
+  }
+}
+
+boards queens_search_diagonals(int n){
+  // return solutions to n-queens with queens on both long diagonals
+  solutions = new_boards();
+  permute(n, &queens_diagonal_permutation);
+  return solutions;
+}
+
 boards queens_search(int n){
+  // return solutions to n-queens problem.
   n_permutations = 0;
   solutions = new_boards();
-  permute(n, &check_permutation);
+  permute(n, &queens_permutation);
   // printf("searched %i permutations.\n", n_permutations);
   return solutions;
 }

@@ -1,5 +1,5 @@
 /*
- * dancing_links.c    v1.02
+ * dancing_links.c
  *
  * An implementation in C of Knuth's Dancing Links 
  * approach to Algorithm X for the "exact cover" problem.

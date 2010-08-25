@@ -90,7 +90,7 @@ void print_answer_perm(solutions answer, boards diags, int which){
 
 int main() {
   int n, n_diags_cols, n_diags_rows;
-  boards solns, diags;
+  boards diags;
   int* matrix;
   solutions answer;
 
@@ -103,27 +103,22 @@ int main() {
   for (n=low; n<=high; n++){
     printf(" n=%i ", n);  fflush(stdout);
 
-    solns = queens_search(n);
-    printf("nqueens=%i ", solns->count);  fflush(stdout);
+    diags = queens_search_diagonal(n);
+    printf("nqueens_diagonal=%i ", diags->count);  fflush(stdout);
 
-    if (solns->count > n){
-      diags = in_both_diagonals(solns);
-      printf("diags=%i ", diags->count);  fflush(stdout);
+    if (diags->count > n){
+      n_diags_cols = pow(diags->first->n, 2);
+      n_diags_rows = diags->count;
 
-      if (diags->count > n){
-	n_diags_cols = pow(diags->first->n, 2);
-	n_diags_rows = diags->count;
-
-	matrix = make_matrix(diags);
-	// printf("\n === enter dancing_links == \n"); fflush(stdout);
-	answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
-	// printf(" === leave dancing_links ==\n"); fflush(stdout);
-	printf("solns=%i ", answer->i_solns);  fflush(stdout);
-	if (answer->i_solns > 0){
-	  //print_answer_perm(answer, diags, 0);
-	  printf("\n");
-	  print_an_answer(answer, diags, 0);    // solution 0
-	}
+      matrix = make_matrix(diags);
+      // printf("\n === enter dancing_links == \n"); fflush(stdout);
+      answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
+      // printf(" === leave dancing_links ==\n"); fflush(stdout);
+      printf("solns=%i ", answer->i_solns);  fflush(stdout);
+      if (answer->i_solns > 0){
+	//print_answer_perm(answer, diags, 0);
+	printf("\n");
+	print_an_answer(answer, diags, 0);    // solution 0
       }
     }
     printf("\n");  fflush(stdout);
