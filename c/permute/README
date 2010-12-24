@@ -11,6 +11,13 @@
  Compiling and running it :
    $ make
    $ ./test
+   ==== permute(3, &print_permutation) ====
+   012
+   021
+   201
+   210
+   120
+   102
 
  Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
  This is open source software under the terms of the MIT License 

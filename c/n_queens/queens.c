@@ -1,5 +1,5 @@
 /*
- *  See queens.h 
+ *  See ./queens.h and ./README
  */
 
 #include <stdio.h>

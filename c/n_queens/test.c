@@ -1,18 +1,9 @@
 /*
  * test.c
  *
- * Some tests for the n_queens problem.
- * See ./queens.h and ./README for details.
+ * Some tests for the n_queens problem;
+ * see ./queens.h and ./README for the details.
  *
- * == queens_search_diagonals timing ====
- *   n = 10 ; count =   544 ; time = 00:00:00.773
- *   n = 11 ; count =  1744 ; time = 00:00:09.314
- *   n = 12 ; count =  9440 ; time = 00:02:01.546
- *   n = 13 ; count = 52008 ; time = 00:29:49.561  52k*13*(4 bytes) = 2.7MB
- *   n = 14                   estimate about 7 hours (*14) ~ 40MB
- *   n = 15                   estimate about 4 days (*15) ~ 600MB
- *
- * Times are with 2.66GHz Intel Core i7 running Mac OS X 10.6.4 on Aug 2010.
  */ 
 
 #include <stdio.h>
@@ -44,6 +35,8 @@ int main() {
 
   printf("==== print_board(good_board) ====\n");
   print_board(good_board);
+  printf("==== print_board_as_perm(good_board) ====\n");
+  print_board_as_perm(good_board);
 
   printf("==== valid_diagonals ====\n");
   printf(" good board : %i \n", valid_diagonals(8, good_queens));

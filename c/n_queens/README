@@ -1,12 +1,12 @@
 
- N-queens problem in C
+ N-queens problem in C;
+ brute force search over permutations of one queen per row and column.
 
- Requires ../permute/* permutation generator.
+ Requires permutation code in ../permute/permute.h and permute.c .
 
- Compiling and running it :
+ Compiling and running tests :
    $ make
    $ ./test
-
    ==== print_board(good_board) ====
       .  .  .  .  Q  .  .  . 
       .  Q  .  .  .  .  .  . 
@@ -17,6 +17,8 @@
       Q  .  .  .  .  .  .  . 
       .  .  .  .  .  .  Q  . 
    
+   ==== print_board_as_perm(good_board) ====
+    [4,1,3,5,7,2,0,6]
    ==== valid_diagonals ====
     good board : 1 
     bad board  : 0 
@@ -58,6 +60,8 @@
     n = 13 ; count = 52008 ; time = 00:29:49.561 ; 52k*13*(4 bytes) = 2.7MB
     n = 14                   estimate about 7 hours (*14) ~ 40MB
     n = 15                   estimate about 4 days (*15) ~ 600MB
+
+ Times are with 2.66GHz Intel Core i7 running Mac OS X 10.6.4 on Aug 2010.
 
  Copyright (c) 2010 Jim Mahoney, Marlboro College (mahoney@marlboro.edu).
  This is open source software under the terms of the MIT License 

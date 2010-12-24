@@ -1,0 +1,435 @@
+Found solution with 61 moves :
+       O O o p
+   g . O     P
+   G   O     P
+   g . o P P P
+     p   P    
+   . P P P . .
+
+       O O o .
+   g . O     p
+   G   O     P
+   g p o P P P
+     P   P    
+   . P P P . .
+
+       O O O o
+   g . O     p
+   G   o     P
+   g p . P P P
+     P   P    
+   . P P P . .
+
+       O O O o
+   G g O     p
+   g   o     P
+   . p . P P P
+     P   P    
+   . P P P . .
+
+       O O o .
+   G g O     p
+   g   O     P
+   . p o P P P
+     P   P    
+   . P P P . .
+
+       O O o p
+   G g O     P
+   g   O     P
+   . . o P P P
+     p   P    
+   . P P P . .
+
+       O o . p
+   G g O     P
+   g   O     P
+   . o O P P P
+     p   P    
+   . P P P . .
+
+       O o p P
+   G g O     P
+   g   O     P
+   . o O P P P
+     .   P    
+   . p P P . .
+
+       O o . p
+   G g O     P
+   g   O     P
+   . o O P P P
+     .   P    
+   p P P P . .
+
+       O O o p
+   G g O     P
+   g   O     P
+   . . o P P P
+     .   P    
+   p P P P . .
+
+       O O o p
+   g . O     P
+   G   O     P
+   g . o P P P
+     .   P    
+   p P P P . .
+
+       O o . p
+   g . O     P
+   G   O     P
+   g o O P P P
+     .   P    
+   p P P P . .
+
+       O o p P
+   g . O     P
+   G   O     P
+   g o O P P P
+     .   P    
+   . p P P . .
+
+       o . p P
+   g . O     P
+   G   O     P
+   g O O P P P
+     o   P    
+   . p P P . .
+
+       o . . p
+   g . O     P
+   G   O     P
+   g O O P P P
+     o   P    
+   p P P P . .
+
+       o . . p
+   G g O     P
+   g   O     P
+   . O O P P P
+     o   P    
+   p P P P . .
+
+       o . p P
+   G g O     P
+   g   O     P
+   . O O P P P
+     o   P    
+   . p P P . .
+
+       o p P P
+   G g O     P
+   g   O     P
+   . O O P P P
+     o   P    
+   . . p P . .
+
+       . p P P
+   G g o     P
+   g   O     P
+   . O O P P P
+     O   P    
+   . o p P . .
+
+       . p P P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   o O p P . .
+
+       p P P P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   o O . p . .
+
+       p P P P
+   G g o     P
+   g   O     P
+   . O O P P P
+     O   P    
+   . o . p . .
+
+       p P P P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   . O o p . .
+
+       . p P P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   . O o P p .
+
+       . . p P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   . O o P P p
+
+       . . p P
+   G g o     P
+   g   O     P
+   . O O P P P
+     O   P    
+   . o . P P p
+
+       . . p P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   o O . P P p
+
+       . . p P
+   g G g     P
+   .   o     P
+   . O O P P P
+     O   P    
+   o O . P P p
+
+       g . p P
+   . g G     P
+   .   o     P
+   . O O P P P
+     O   P    
+   o O . P P p
+
+       g p P P
+   . g G     P
+   .   o     P
+   . O O P P P
+     O   P    
+   o O . P p .
+
+       . p P P
+   g G g     P
+   .   o     P
+   . O O P P P
+     O   P    
+   o O . P p .
+
+       . p P P
+   G g .     P
+   g   o     P
+   . O O P P P
+     O   P    
+   o O . P p .
+
+       . p P P
+   G g o     P
+   g   O     P
+   . O O P P P
+     O   P    
+   . o . P p .
+
+       o p P P
+   G g O     P
+   g   O     P
+   . O O P P P
+     o   P    
+   . . . P p .
+
+       o . p P
+   G g O     P
+   g   O     P
+   . O O P P P
+     o   P    
+   . . . P P p
+
+       o . p P
+   g . O     P
+   G   O     P
+   g O O P P P
+     o   P    
+   . . . P P p
+
+       . . p P
+   g . o     P
+   G   O     P
+   g O O P P P
+     O   P    
+   . o . P P p
+
+       . . p P
+   g . .     P
+   G   o     P
+   g O O P P P
+     O   P    
+   . O o P P p
+
+       . p P P
+   g . .     P
+   G   o     P
+   g O O P P P
+     O   P    
+   . O o P p .
+
+       p P P P
+   g . .     P
+   G   o     P
+   g O O P P P
+     O   P    
+   . O o p . .
+
+       P P P P
+   g . p     P
+   G   o     P
+   g O O P P P
+     O   p    
+   . O o . . .
+
+       P P P P
+   g p P     P
+   G   o     P
+   g O O p P P
+     O   .    
+   . O o . . .
+
+       P P P P
+   g p P     P
+   G   .     P
+   g O o p P P
+     O   .    
+   . O O o . .
+
+       P P P P
+   g . p     P
+   G   .     P
+   g O o P P P
+     O   p    
+   . O O o . .
+
+       P P P P
+   g . P     P
+   G   p     P
+   g O o p P P
+     O   .    
+   . O O o . .
+
+       P P P P
+   g . P     P
+   G   p     P
+   g o . p P P
+     O   .    
+   . O O O o .
+
+       P P P P
+   g . P     P
+   G   p     P
+   g . . p P P
+     o   .    
+   . O O O O o
+
+       P P P P
+   . . P     P
+   g   p     P
+   G g . p P P
+     o   .    
+   . O O O O o
+
+       P P P P
+   . . p     P
+   g   .     P
+   G g . P P P
+     o   p    
+   . O O O O o
+
+       P P P P
+   . p P     P
+   g   .     P
+   G g . p P P
+     o   .    
+   . O O O O o
+
+       P P P P
+   p P P     P
+   g   .     P
+   G g . . p P
+     o   .    
+   . O O O O o
+
+       P P P P
+   p P P     P
+   .   .     P
+   g G g . p P
+     o   .    
+   . O O O O o
+
+       P P P P
+   p P P     P
+   .   .     P
+   . g G g p P
+     o   .    
+   . O O O O o
+
+       P P P P
+   p P P     P
+   .   .     P
+   . . g G p P
+     o   g    
+   . O O O O o
+
+       P P P P
+   p P P     P
+   .   .     P
+   . o g G p P
+     O   g    
+   . O O O o .
+
+       P P P P
+   p P P     P
+   .   g     P
+   . o G g p P
+     O   .    
+   . O O O o .
+
+       P P P P
+   p P P     P
+   .   g     P
+   o O G g p P
+     O   .    
+   . O O o . .
+
+       P P P P
+   p P P     P
+   o   g     P
+   O O G g p P
+     O   .    
+   . O o . . .
+
+       P P P P
+   p P P     P
+   o   .     P
+   O O g G p P
+     O   g    
+   . O o . . .
+
+       P P P P
+   p P P     P
+   o   .     P
+   O O . g p P
+     O   G    
+   . O o g . .
+
+       P P P P
+   p P P     P
+   o   .     P
+   O O . . p P
+     O   g    
+   . O o G g .
+
+       P P P P
+   p P P     P
+   o   .     P
+   O O . . p P
+     O   .    
+   . O o g G g
+
