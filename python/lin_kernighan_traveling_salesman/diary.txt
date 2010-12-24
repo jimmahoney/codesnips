@@ -1,0 +1,354 @@
+
+
+------------------------------------
+At the end of september I wrote this down as 
+a guesstimate of a quasi implementation of L.K. :
+
+# Recursive LK search.
+def search(tour, old_roads, new_roads):
+  # Input: old_roads[] found so far in tour, 
+  #        to be replaced with new_roads[] not in tour.
+  #        (Iteration i implied by size of old_roads[] or new_roads[] lists.)
+  # 
+  # The tour.find_old_roads(...) and tour.find_new_roads(...) routines will do
+  # the work of returning a list of roads that satisfy the constraints listed 
+  # above, except for the Gain() constraint - I've coded that in explicitly.
+  #
+  # And the "new_tour = tour.swap(...)" must replace the old with the new, 
+  # returning a closed tour
+  #
+  for old_road in tour.find_old_roads(old_roads, new_roads):
+    old_roads.append(old_road)
+    for new_road in tour.find_new_roads(old_roads, new_roads):
+      if old_road.cost() > new_road.cost):               # or sum costs if need be
+        new_roads.append(new_road)
+        possible_tour = tour.swap(old_roads, new_roads)
+        if possible_tour.length() < tour.length():
+          return search(possible_tour, [], possible_tour.roads)
+        elif len(old_roads) <= max_depth:                # don't go below some depth
+          return search(tour, old_roads, new_roads)      # on to i = i + 1 iteration
+        new_roads.pop()  # backtrack
+    old_roads.pop()    # backtrack
+
+
+---------------------------------------------------------
+Nov 24 2010
+
+Now that we're only weeks away from his orals, still without
+working code, I thought I'd start from scratch to see just
+what implementing this thing might look like, as a way
+of understanding it better.
+
+Setting the basic classes for Cities, Roads, and the TSP itself,
+including string output and an SVG graph (just for fun) took about
+3 hours late Thanksgiving evening.  
+
+I now have both Cities and Roads inherit from python sets; I can
+extend with other methods as needed.  Each city and road also links
+back to the TSP; and the TSP holds the full complement of all cities
+and roads.  Each city also has a set of the roads that reach it.
+That version has been saved as tsp_jim.py-1 .
+
+Next is to get to the meat of it: implement a Trip as a sequence
+of roads and/or cities (or probably both), with whatever list and/or
+set properties needed, and use the L.K. algorithm - probably within
+the TSP class - to improve a Trip.  I guess that it can always
+be closed, so as long as it has all N cities (with no repeats), 
+it can be thought of as having one more road to close it.
+
+-------------------------------
+late Fri Nov 26 evening
+
+Put in about 5 hours getting the python inheritance classes 
+and data structures to a reasonable state.
+Version 2 :
+ * has City, Road, Cities, Roads, Trips, and TSP classes;
+ * can print out an SVG picture of the graph and one tour
+ * has 6 city test case, various doctests
+ * can do a brute force analysis of best and worst tours
+
+... and think I now have the infrastructure set to look at L.K.
+I will likely need to add more bells and whistles to the classes,
+but expect that the basic structure is sound as it is.
+
+-------------------------------
+Sat Nov 27
+
+Looking to review the descriptions of this algorith, 
+http://en.wikipedia.org/wiki/Lin%E2%80%93Kernighan_heuristic
+points at  http://www.research.att.com/~dsj/papers/TSPchapter.pdf
+which I've saved to this folder.
+
+Implemented Path as core L.K. data structure, based on set of roads.
+The sequence of cities is done with a linked-list, dictionary,
+and will be altered when the directionality along the sequence changes.
+See the code for the details.
+
+Refined the Path model; ended up with a structure that serves
+as either a closed Tour or an L.K. 'Path' with a first and last city
+and a direction; last working code+tests is saved as versions/tsp.py-3 ,
+just before starting on the top level LK_search stuff.
+
+Have a preliminary version of the top level recursive search
+within the TSP class; not tested yet because the underpinnings aren't finished.
+Saved the (untested) code as versions/tsp.py-4
+
+I've included several options with are intended to 
+
+What's left is the implementation of the LK Path modification,
+which looks to be a bit persnickity but straightforward now
+that all the structures are in place; link futzing at its finest.
+
+Spent most of the day on this; probably around 10 hours altogether.
+
+------------
+Sun Nov 28
+
+Sick.  
+
+Put in about 5 hours in the evening; tsp.py-5 
+has passed some tests of tour.find_lk_mods(), 
+tour.modify(), and tour.unmodify().  So all
+that's left is to test/fix the top level 
+recursive search, and it should be viable.
+
+--------------
+Mon Nov 29
+
+Still sick.
+
+Spent another 7 hours or so, mostly stuck on bugs:
+ * python gotchas (never put empty lists
+  or sets into default function args; you can
+  end up with multiple versions starting from
+  the same collection, with bad results)
+ * genuine algorithm problems (aborting the recursive
+  search when a better tour was found turned 
+  out to be more trouble than it was worth;
+  my recursive call tree didn't have the right
+  flags set up to either bail all the way out,
+  or to leave everything in its proper place.)
+ * and possibly other gremlins.
+
+At least the 6 city test case can now be solved;
+a working copy is in versions/tsp.py-6 ; 
+see tsp.out 
+
+Something non-deterministic is going on, though;
+perhaps I'm looping over an unordered set
+or some such which runs the algorithm slightly
+differently on different runs.  But minor changes
+in the code can produce differences in the 
+ordering of the final result, for example 
+
+ File "tsp.py", line 677, in __main__.TSP
+ Failed example:
+    str(tsp.tour)
+ Expected:
+     '<Tour (6 roads, length 7.17): A - B - C - D - E - F - A>'
+ Got:
+     '<Tour (6 roads, length 7.17): F - A - B - C - D - E - F>'
+
+And that very same run gave this finish to the vebose printout :
+
+       -- path_search  depth=4, path=6.040756, tour=7.170756, n_mods=0 
+      -> result path=7.170756; tour=7.170756
+     -> result path=7.170756; tour=7.170756
+    -> result path=7.170756; tour=7.170756
+   -> result path=7.170756; tour=7.170756
+ ---- done path_search; found length=7.170756
+ ===== finished tour_improve; best is 
+  <Tour (6 roads, length 7.17): D - C - B - A - F - E - D> 
+
+This is the same result, but backwards and with a different 
+(arbitrary, to be sure) endpoint.
+
+Hmmm.  There's a loop over roads (which is a set) in tour_improve,
+which I've just changed to the go over a sorted version.  The tests
+now seem to run consistently.  But I'm still seeing some variation in
+tsp.LK() between different parts of the program;
+
+The doctest gives 
+ '<Tour (6 roads, length 7.17): D - E - F - A - B - C - D>'
+while the printout gave 
+ '<Tour (6 roads, length 7.17): D - C - B - A - F - E - D>'
+starting from what I thought was the same state.  Maybe not?
+
+Here's what it looks like interactively, in one session.
+
+>>> from tsp import *
+
+>>> tsp = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
+>>> print tsp
+<TSP:
+  <Cities (6): A, B, ..., E, F>
+  <Roads (15): E--F (0.90), D--E (1.00), ..., C--F (2.54), A--D (2.58)>
+  <Tour (6 roads, length 10.75): A - D - C - E - B - F - A> >
+>>> tsp.LK()
+>>> print tsp
+<TSP:
+  <Cities (6): A, B, ..., E, F>
+  <Roads (15): E--F (0.90), D--E (1.00), ..., C--F (2.54), A--D (2.58)>
+  <Tour (6 roads, length 7.17): D - E - F - A - B - C - D> >
+
+>>> tsp = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
+>>> tsp.LK()
+>>> print tsp
+<TSP:
+  <Cities (6): A, B, ..., E, F>
+  <Roads (15): E--F (0.90), D--E (1.00), ..., C--F (2.54), A--D (2.58)>
+  <Tour (6 roads, length 7.17): D - C - B - A - F - E - D> >
+
+>>> tsp = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
+>>> tsp.LK()
+>>> print tsp
+<TSP:
+  <Cities (6): A, B, ..., E, F>
+  <Roads (15): E--F (0.90), D--E (1.00), ..., C--F (2.54), A--D (2.58)>
+  <Tour (6 roads, length 7.17): A - F - E - D - C - B - A> >
+
+Weird.
+
+Next things that could be done :
+
+ * print out some pretty pictures of the intermediate steps, similar
+   to six_cities.svg (which is the starting point of the test case)
+
+ * test on more cities, probably randomly positioned, to see
+   (a) how well it does in getting near the best answer, and
+   (b) how long it takes.
+
+In particular, how large a problem can this handle in a reasonably
+short period of time?  Well, that at least shouldn't be too hard
+to answer.  But maybe not right now.
+
+
+Total time on this over the long weekend : 
+Thu Fri Sat  Sun Mon
+3 + 5 + 10 + 5 + 7   = 30 hours
+
+Since a 4 credit course is about, 12 hours/week, 
+this would nominally be 3 weeks of work.
+Or maybe double (triple?) that for a student
+... which would be half to most of the semester.
+
+===============
+Tue Nov 30
+
+Still sick; couldn't sleep, stayed home and skipped classes.  Blech.
+
+Changed back to sets for added,deleted in path_search.
+
+Had an idea for the restart_better_tours: 
+throw an exception to jump all the way back out 
+to a try/except in LK().
+...and it looks like it works!
+
+File output looks much shorter, so presumably that is quicker.
+Spent under an hour on it.
+
+===============
+Sat Dec 4 ; about 4 hours total
+
+Modified tour.__str__ to put optionally put cities in a "normal order" 
+so that different orderings of same tour print the same; hopefully 
+the brute_force test will always pass now.
+
+Added in random cities, n cities, and some statistics.  
+With n=6 cities, typical run time is 0.1 sec; 
+however, occasionally LK "gets stuck" and doesn't
+return even after a few minutes.  Hmmm.
+Saved verbose output to stuck_dec4.txt
+Looks like it's restarting with a *worse* tour; 
+
+  !! restart with better tour ; using <Tour (6 roads, length 115.20): ...
+  ===== starting tour_improve with 12 paths to check
+  ---- calling 1 path_search on <Path (5 roads, length 79.31, tour 115.20): ...
+  ...
+     -- path_search  depth=1, path=100.927332, tour=124.716394, n_mods=1 
+     -> (city, road_add, road_rm) = (#17 (34.15, 59.19), #17--#18 (14.55), #14--#17 (35.88)) 
+     -> modified path <Path (5 roads, length 79.60, tour 122.66): ...
+  !! restart with better tour ; using <Tour (6 roads, length 122.66): ...
+  ====
+
+Oops.  Looking at the code, I think the problem is that the algorithm restarts
+if it finds a tour better than the one in at the start of path_search, which
+may not be the absolute best seen so far.  So I'm modifying the code to include
+tsp._lk_tour_length, and will only restart when better than that.
+
+trying 100 cities (cities (x,y) 0 to 100) :
+ search_roads_per_city = -1 :
+   time=10sec, went from length=5536 to length=818
+ search_roads_per_city = 8 : time=11 sec ; 4973 => 783
+ search_roadd_per_city = 5 : time= 7 sec ; 5478 => 827
+
+trying 200 cities, 
+  roads_per_city =-1 : time = 85sec ; 10645 => 1113
+  roads_per_city = 8 : time = 58sec ; 10404 => 1104
+  roads_per_city = 5 : time = 40sec ; 10427 => 1470
+
+For no strong reason, I'm going to leave roads_per_city at 10.
+
+Also did some statistics :
+ restart_lk = true, roads_per_city=10 :
+ each line is average of 10 trials :
+
+    n   time       tour    lk_tour 
+ ----   ----   --------   -------- 
+    5   0.01     273.18     230.48 
+   10   0.03     477.69     277.56 
+   20   0.14     988.69     374.77 
+   40   0.73    2065.06     521.65 
+   80   4.43    4113.41     714.95 
+  160  27.80    8238.51     998.67 
+
+I used mathematica to fit time vs n :
+
+ n = {5, 10, 20, 40, 80, 160};
+ t = {0.01, 0.03, 0.14, 0.73, 4.43, 27.8};
+ data=Transpose[{n,t}];
+ l=ListPlot[data,AxesOrigin->{-2, -2}]
+ f = Fit[data, {1,x,x^2, x^3},x]
+ Show[l, Plot[f,{x,0,170}]]
+
+and got 
+ time = 0.03 - 0.0047 t + 0.000377 t**2 + 4.6e-6 t**3 
+which is right on top of the data.  
+A screenshot of the plot is in time_vs_n.png .
+
+There's only 6 points, so fitting a 3rd order 
+poly is a bit questionable ... but the cubic
+term has a pretty small coefficient.
+And ListLogPlot turns over strongly, indicating
+that it is indeed a polynomial.
+
+Then I modified TSP.LK() to take an "n_tries" argument, 
+and to run the same collection of cities with 
+different random initial tours that many times,
+returning the best result.
+
+Created a "random50_before.svg" and "random50_after.svg"
+with restart_tours=True, roads_per_city=10 (my current defaults)
+and n_tries = 10 .  Took a minute or so to run.
+
+  thirty-two:nov$ python tsp.py
+  -- TSP with 50 random cities --
+    outputting to 'random50_before.svg' ; length =  2629.95
+    running LK tour improvement with 10 starting tours
+    done.  best=  567.45, mean=  571.53, sigma=    1.82 
+    outputting to 'random50_after.svg'
+  thirty-two:nov$ 
+
+That one may not be representative; sigma=1.8 looks smaller
+than other runs I've seen. And the _after.svg looks particularly
+clean and circular; I've seen some with one big jump.
+
+But next run gave sigma=4.6, and still no obvious big jumps
+in the _after.svg.  So I guess it's working fairly OK
+
+Enough for now.
+
+-----------------------------------
+
+
+
