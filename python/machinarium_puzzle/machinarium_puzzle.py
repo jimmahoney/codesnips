@@ -208,30 +208,35 @@ class Puzzle:
 
   def search(self, depth):
     """ Recursive search for solution. """
-    # depth_first
-    # iterative deepening
-    # backtrack
-    # no repeated positions
+    # depth_first, backtrack, no repeated positions, depth limited
     #
-    #print " "*len(self.history) + str(len(self.seen))
+    # A breadth first search might be better, but would require that
+    # the search tree have contain puzzles with complete state,
+    # not just do/undo moves on one puzzle.
+    # The approach here uses less memory but is necessarily depth-first.
+    # Using a 'fringe' of puzzled to be searched
+    # as a queue gives breadth-first search;
+    # as a stack gives depth-first.
+    #
+    ## print " "*len(self.history) + str(len(self.seen))  ## debug
     if depth < 0:
       return
-    self_string = str(self)
-    if self_string in self.seen:
-      return
-    else:
-      #print self_string
-      self.seen.add(self_string)
+    self_string = str(self)                #
+    if self_string in self.seen:           # Don't search positions
+      return                               # which have been seen before.
+    else:                                  #
+      ## print self_string  ## debug       #
+      self.seen.add(self_string)           #
     if self.is_solved():
       raise Exception('done')
     else:
       for move in self.moves():
         self.do_move(move)
-        self.search(depth-1)
+        self.search(depth - 1)
         self.undo_move()
 
   def solve(self):
-    """ Iterative deepening search. """
+    """ Iterative deepening search """
     try:
       depth = 1
       while True:
