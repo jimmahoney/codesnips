@@ -14,4 +14,4 @@ Jim Mahoney, Marlboro College, Feb 2011
 
 This is free software which is released
 under the Artistic License or GPL, 
-whichever you prefer.
+whichever you prefer. 
