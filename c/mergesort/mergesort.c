@@ -1,6 +1,8 @@
 /*
  * mergesort.c
  * Jim M | Feb 2011 | GPL
+ *
+ * To see debug printing, uncomment the printf() lines.
  */ 
 
 #include "mergesort.h"
