@@ -2,7 +2,7 @@
  N-queens problem in C;
  brute force search over permutations of one queen per row and column.
 
- Requires permutation code in ../permute/permute.h and permute.c .
+ Requires the code in ../permute/permute.h and permute.c .
 
  Compiling and running tests :
    $ make
