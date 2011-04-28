@@ -1,0 +1,100 @@
+
+$ python tsp.py 
+-- TSP with 300 random cities --
+ 4.71 sec elapsed : original is <TSP:
+  <Cities (300): #33, #272, ..., #17, #137>
+  <Roads (44850): #204--#281 (0.39), #113--#97 (0.40), ..., #134--#65 (130.50), #21--#65 (130.91)>
+  <Tour (300 roads, length 15392.83): #33 - #272 - #226 - ... - #97 - #17 - #137 - #33> >
+ 193.60 sec elapsed : LK is <TSP:
+  <Cities (300): #33, #272, ..., #17, #137>
+  <Roads (44850): #204--#281 (0.39), #113--#97 (0.40), ..., #134--#65 (130.50), #21--#65 (130.91)>
+  <Tour (300 roads, length 1341.61): #235 - #139 - #265 - ... - #305 - #162 - #216 - #235> >
+thirty-two:lin_kernighan_traveling_salesman$ 
+
+-------------
+
+$ python
+>>> import pstats
+>>> p = pstats.Stats('profile_N300.out')
+>>> p.sort_stats('cumulative').print_stats(30)
+
+Thu Apr 28 03:38:25 2011    profile_N300.out
+
+         232016695 function calls (232001351 primitive calls) in 198.380 CPU seconds
+
+   Ordered by: cumulative time
+   List reduced from 106 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  198.380  198.380 <string>:1(<module>)
+        1    0.001    0.001  198.380  198.380 tsp.py:1123(main)
+        1    0.116    0.116  193.669  193.669 tsp.py:911(LK)
+      497    0.860    0.002  193.550    0.389 tsp.py:960(tour_improve)
+21701/6365    1.145    0.000  168.312    0.026 tsp.py:995(path_search)
+    27545   45.607    0.002  129.313    0.005 tsp.py:487(__init__)
+    28350    6.184    0.000   64.319    0.002 tsp.py:314(__init__)
+  8577544   46.357    0.000   56.333    0.000 tsp.py:325(update_cities)
+    37726    8.616    0.000   29.950    0.001 tsp.py:692(city_sequence)
+    34051    7.382    0.000   27.380    0.001 tsp.py:632(flip_direction)
+     6365    0.046    0.000   21.827    0.003 tsp.py:524(revert)
+  8586759    6.833    0.000   18.654    0.000 tsp.py:362(get)
+ 12989483   11.862    0.000   16.457    0.000 tsp.py:149(__cmp__)
+    15832    0.058    0.000   14.105    0.001 tsp.py:646(modify)
+    14811    0.067    0.000   13.359    0.001 tsp.py:673(unmodify)
+ 87468115   13.292    0.000   13.292    0.000 tsp.py:144(__hash__)
+  8682174    7.283    0.000   10.038    0.000 {method 'get' of 'dict' objects}
+ 12869424    7.804    0.000    9.790    0.000 tsp.py:686(next_city)
+  6931935    6.580    0.000    8.414    0.000 tsp.py:627(flip1city)
+  6659406    6.469    0.000    7.222    0.000 tsp.py:287(append)
+  8577544    4.971    0.000    4.971    0.000 tsp.py:220(__eq__)
+        2    0.000    0.000    4.711    2.355 tsp.py:788(__init__)
+        2    0.447    0.224    4.698    2.349 tsp.py:889(init_TSP)
+  8593834    2.933    0.000    3.511    0.000 tsp.py:208(__hash__)
+ 12989483    2.394    0.000    2.394    0.000 {cmp}
+ 12936497    2.201    0.000    2.201    0.000 tsp.py:141(__str__)
+   165238    0.446    0.000    2.188    0.000 tsp.py:347(add)
+    21701    0.664    0.000    1.922    0.000 tsp.py:535(find_lk_mods)
+ 17256661    1.859    0.000    1.859    0.000 {isinstance}
+     6365    0.023    0.000    1.690    0.000 tsp.py:592(tour2path)
+
+>>> p.sort_stats('time').print_stats(30)
+p.sort_stats('time').print_stats(30)
+Thu Apr 28 03:38:25 2011    profile_N300.out
+
+         232016695 function calls (232001351 primitive calls) in 198.380 CPU seconds
+
+   Ordered by: internal time
+   List reduced from 106 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  8577544   46.357    0.000   56.333    0.000 tsp.py:325(update_cities)
+    27545   45.607    0.002  129.313    0.005 tsp.py:487(__init__)
+ 87468115   13.292    0.000   13.292    0.000 tsp.py:144(__hash__)
+ 12989483   11.862    0.000   16.457    0.000 tsp.py:149(__cmp__)
+    37726    8.616    0.000   29.950    0.001 tsp.py:692(city_sequence)
+ 12869424    7.804    0.000    9.790    0.000 tsp.py:686(next_city)
+    34051    7.382    0.000   27.380    0.001 tsp.py:632(flip_direction)
+  8682174    7.283    0.000   10.038    0.000 {method 'get' of 'dict' objects}
+  8586759    6.833    0.000   18.654    0.000 tsp.py:362(get)
+  6931935    6.580    0.000    8.414    0.000 tsp.py:627(flip1city)
+  6659406    6.469    0.000    7.222    0.000 tsp.py:287(append)
+    28350    6.184    0.000   64.319    0.002 tsp.py:314(__init__)
+  8577544    4.971    0.000    4.971    0.000 tsp.py:220(__eq__)
+  8593834    2.933    0.000    3.511    0.000 tsp.py:208(__hash__)
+ 12989483    2.394    0.000    2.394    0.000 {cmp}
+ 12936497    2.201    0.000    2.201    0.000 tsp.py:141(__str__)
+ 17256661    1.859    0.000    1.859    0.000 {isinstance}
+21701/6365    1.145    0.000  168.312    0.026 tsp.py:995(path_search)
+      497    0.860    0.002  193.550    0.389 tsp.py:960(tour_improve)
+  6692934    0.767    0.000    0.767    0.000 {method 'append' of 'list' objects}
+    21701    0.664    0.000    1.922    0.000 tsp.py:535(find_lk_mods)
+    44865    0.628    0.000    1.200    0.000 tsp.py:193(__init__)
+  8639005    0.585    0.000    0.585    0.000 {id}
+    95413    0.562    0.000    1.060    0.000 tsp.py:158(__init__)
+        2    0.447    0.224    4.698    2.349 tsp.py:889(init_TSP)
+   165238    0.446    0.000    2.188    0.000 tsp.py:347(add)
+  1255001    0.445    0.000    0.445    0.000 tsp.py:226(__lt__)
+      308    0.379    0.001    0.823    0.003 {method 'sort' of 'list' objects}
+    67651    0.258    0.000    0.732    0.000 tsp.py:604(replace_neighbors)
+    37008    0.219    0.000    0.283    0.000 tsp.py:353(remove)
+

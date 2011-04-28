@@ -350,5 +350,113 @@ Enough for now.
 
 -----------------------------------
 
+April 2011
 
+ Working on some profile and optimization/speedup stuff
+ for an algorithms class.
 
+ a. Added a memoization class for factorial() function.
+ b. Is "isn't behaving deterministically" comment still true?
+
+ == making it faster ==
+
+ 0a. choose algorithm
+ 0b. get it to work at all, and understand run time
+ 1.  memory (don't thrash)
+
+ 2.  profiling loop:
+        test it
+        profile it, find out which parts are slow
+        rewrite slowest parts
+
+ 2.1 memoization
+        I give a simple example; 
+
+ 3.  C for slow bits:
+        details vary with language you're embedding in;
+        from python one typically creates a "setup.py"
+        file and let python itself compile the C code.
+        Usually you end up writing a "wrapper" around the C.
+
+        Or you can use PyInline (!) (Though it's old.)
+
+ 4.  can this problem run concurrently ?
+        a) Will the problem let you do that?
+        b) If so, what do you have access to? multiple cpus? machines?
+        See e.g. http://wiki.python.org/moin/ParallelProcessing
+
+ 5.  more cpu/memory help ?
+     	See e.g. www.picloud.com   
+
+ *.  Or has someone else done the problem (or part of it) for you?
+       http://nodebox.net/code/index.php/Graph
+
+ ---------------------------
+ python profiling :
+  http://docs.python.org/library/profile.html
+
+  take 1:
+   brute force with N=10: elapsed 219 sec
+
+   for the brute force approach, it turns out that just creating the Tour() 
+   repeatedly takes most of the time, and in fact I'm doing that twice(!)
+   for each one. So presumbably just by taking that out I can get a factor
+   of two better.
+
+   re-writing that just a bit (to remove two Tour() calls) took it to 177.
+   Not a factor of two, but 20%.
+
+   But in fact the roads should have to change at all for this brute
+   force case; re-using the same Tour() for each permutation would
+   make this much faster.
+
+   What happened here is that this code wasn't originally intended
+   to do the brute force calculation (which can't be done in any
+   case for N>11 or so), and so I didn't bother thinking about
+   that very much; it was an afterthought and not optimized.
+
+  take 2:
+   try same with the actual LK() algorithm ... started; continue in class?
+
+   See N300.out ; It's still spending way too much time in update_cities ;
+   ncalls = 8577544 with 46 sec ... something looks wrong there.
+   I think I'm generating new Tour() which recalculate (and re-hash)
+   way too much road information; with 300 cities there should just
+   be the 300*299 = 89700 roads, not a hundred times that number
+   of calls (8577544) to update_cities (!)
+
+   ... so that would be the place to start making this faster.
+
+ ----------------------------
+ python linking to C ; see the embed_c folder
+  http://docs.python.org/c-api/
+  http://wiki.cacr.caltech.edu/danse/index.php/Writing_C_extensions_for_Python
+  http://wiki.cacr.caltech.edu/danse/index.php/Lots_more_details_on_writing_wrappers
+
+  On my mac, "python setup.py build" was trying to make a "universal" app,
+  including ppc support, but I don't have compilers for that right now.
+
+  Solution was to first set
+
+    $ export ARCHFLAGS='-arch x86_64'
+
+  Other poosible options: i386 ppc
+  
+  The issue is "universal" apps vs ones for specific machines,
+  and how that interacts with the installed libraries.
+  
+----------------------------------------------------------------------------
+
+Here's a timing thing with one more data point.
+And I've included the Mathematica *.nb file here, too.
+
+thirty-two:lin_kernighan_traveling_salesman$ python tsp.py 
+    n    time       tour    lk_tour 
+ ----   -----   --------   -------- 
+    5    0.01     258.01     213.83 
+   10    0.04     538.32     293.48 
+   20    0.16     989.70     389.04 
+   40    0.73    2130.97     529.67 
+   80    3.85    4288.02     719.37 
+  160   26.23    8125.35     996.07 
+  320   247.23   16873.37    1374.82 

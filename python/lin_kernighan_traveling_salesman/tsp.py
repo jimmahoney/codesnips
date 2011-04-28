@@ -11,16 +11,13 @@
 
  Tested with python 2.6.1.
   
- Jim M | Nov 2010 | GPL
-"""
+ Jim Mahoney | Marlboro College | GPL
 
-#
-# TODO: Generate a variable number N of random (x,y) points, to
-#       (a) see what the run time looks like as a function of N and
-#       (b) see how close it gets to the right answer.
-#           (If we can find the right answer.
-#            Maybe generate non-random points with a known answer?)
-#
+ history
+   Nov 2010 - working version while Richard Scrugs was around.
+   Apr 2011 - profiling etc for algorithms course
+ 
+"""
 
 import re
 import time
@@ -29,7 +26,34 @@ import random
 import doctest
 from svg_graph import SvgGraph
 
+class memoized(object):
+  # from http://wiki.python.org/moin/PythonDecoratorLibrary#Memoize  
+  """Decorator that caches a function's return value each time it is called.
+     If called later with the same arguments, the cached value is returned, and
+     not re-evaluated.
+  """
+  def __init__(self, func):
+    self.func = func
+    self.cache = {}
+  def __call__(self, *args):
+    try:
+      return self.cache[args]
+    except KeyError:
+      value = self.func(*args)
+      self.cache[args] = value
+      return value
+    except TypeError:
+      # uncachable -- for instance, passing a list as an argument.
+      # Better to not cache than to blow up entirely.
+      return self.func(*args)
+  def __repr__(self):
+    """Return the function's docstring."""
+    return self.func.__doc__
+  def __get__(self, obj, objtype):
+    """Support instance methods."""
+    return functools.partial(self.__call__, obj)
 
+@memoized
 def factorial(n):
   """ Return n!
       >>> factorial(0)
@@ -58,11 +82,14 @@ def permutations(collection):
       for i in range(len(permutation)+1):
         yield permutation[:i] + collection[0:1] + permutation[i:]
 
-def tsp_perms(collection):
-  """ Generate a subset of permutations of collection[]
-      where collection[0] doesn't change (can start TSP at any city)
-      and collection[1] < collection[2] (direction around loop doesn't matter.)
-      >>> list(tsp_perms("abcd"))
+def proper_permutations(collection):
+  """ Generate the subset of permutations of collection[]
+      without cyclic or reverse variants. To do this, we fix
+      the 0th element of the subset and require that 1st < 2nd.
+      This corresponds to the different traveling salesman paths,
+      since a given path can be started at any city and traversed
+      in either direction.
+      >>> list(proper_permutations("abcd"))
       ['abcd', 'acdb', 'abdc']
   """
   for permutation in permutations(collection[1:]):
@@ -124,7 +151,7 @@ class City(object):
 
 
 class Listy(list):
-  """ A custom lists - basically in case I want more features later.
+  """ A custom list - basically in case I want more features later.
       >>> str(Listy([10,20,30]))
       '<Listy (3): 10, 20, 30>'
   """
@@ -179,7 +206,7 @@ class Road(Listy):
     return self._str
 
   def __hash__(self):
-    # Set these be OK as dictionary keys and set elements.
+    # Set these as OK as use dictionary keys and set elements.
     # Otherwise, python is unhappy about using 'em that way,
     # since they inherit from mutable lists.
     return id(self._id)
@@ -340,10 +367,6 @@ class Roads(set):
       return self.by_names.get((city1, city2), None)
     else:
       raise Exception('illegal argument to Roads.get')
-
-  def get_by_name(self, name1, name2):
-    """ Return the road whose endpoints have the given city names. """
-    return self.by_cities.get()
 
   def __str__(self):
     """ as string version is sorted by length and city names """
@@ -747,17 +770,20 @@ class TSP(object):
       10
   """
 
-  #    The LK search isn't behaving deterministically;
-  #    small changes in the code give ordering variations in the best path.
+  #    The LK search wasn't behaving deterministically:
+  #    small changes in the code gave ordering variations in the best path.
   #    Within the same program, repeated 
   #       tsp = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
   #       tsp.LK()
   #       str(tsp.tour)
-  #    gives variations like
+  #    gave variations like
   #     '<Tour (6 roads, length 7.17): D - C - B - A - F - E - D>'
   #     '<Tour (6 roads, length 7.17): D - E - F - A - B - C - D>'
   #     '<Tour (6 roads, length 7.17): A - F - E - D - C - B - A> >
-  #    Maybe a loop over a set somewhere?  I'm not sure.
+  #    Might be a loop over a set or dict (with undefined traversal order).
+  #    Now the tour is made "proper" (one chosen of these equivalent
+  #    versions); and I'm not sure if this is still true.
+  #    And it may not matter anway ... just didn't understand it.
 
   def __init__(self, cities=None, tour=None):
     """ Inputs:
@@ -840,8 +866,18 @@ class TSP(object):
     print "-- brute force analysis of %i cities with %i distinct tours --" \
           % (len(cities), factorial(len(cities)-1)/2)
     names = map(lambda x: x.name, cities)
-    lengths_perms = [(Tour(self, p).tour_length(), Tour(self, p))
-                     for p in tsp_perms(names)]
+
+    ## before profile - this way of doing this was > 20% slower
+    #lengths_perms = [(Tour(self, p).tour_length(), Tour(self, p))
+    #                 for p in proper_permutations(names)]
+
+    ## after profile - only call Tour() once.
+    perms = proper_permutations(names)
+    lengths_perms = []
+    for p in perms:
+      t = Tour(self, p)
+      lengths_perms.append((t.tour_length(), t))
+
     best = min(lengths_perms)
     worst = max(lengths_perms)
     best[1]._str_alphaorder = worst[1]._str_alphaorder = True
@@ -1017,12 +1053,15 @@ class TSP(object):
     (best_length, best_city_seq) = min(results)
     return Tour(self, best_city_seq)
 
+# - - - analysis - - -
+
 def average(numbers):
   """ Return average of a collection of numbers.
       >>> average([1,2,3,4])
       2.5
   """
   return sum(numbers)/(1.0*len(numbers))
+
 def stdev(numbers, sample=True):
   """ Return standard deviation of a collection of numbers.
       If sample=True, use the (n-1) version, treating this as a sample of
@@ -1057,7 +1096,7 @@ def stats_random_tsp(n_cities, m_times):
   return map(lambda x: (average(x), stdev(x)), \
              (times, tour_lengths, tour_lengths_LK))
 
-def stats_random_restart(n_cities, m_times):
+def stats_random_samestart(n_cities, m_times):
   """ Run the same n random cities from
       m_times multiple initial starting tours,
       and report on results. """
@@ -1077,30 +1116,40 @@ def random_tsp(N):
   tour_length = tsp.tour_length()
   tsp.LK()
   tour_length_LK = tsp.tour_length()
-  elapsed_time = time.clock() - start_time
-  return (elapsed_time, tour_length, tour_length_LK)
+  return (time.clock() - start_time, tour_length, tour_length_LK)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 def main():
-  tsp = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
 
-  # Uncomment any of these to get more than tests.
+  # Create the six city example, used for a lot of my tests.
+  tsp6 = TSP(cities='test6', tour=('A', 'D', 'C', 'E', 'B', 'F'))
+
+  # So what ya wanna do?
   
-  if False:                       # generate SVG image
-    tsp.graph('six_cities.svg')
+  if False:                       # generate an SVG image of the 6 city example
+    tsp6.graph('six_cities.svg')
   
-  if False:                       # brute force analysis
+  if False:                       # brute force analysis of 6 city example
     print "-- test6 --"
-    print tsp
-    tsp.print_brute_force()
+    print tsp6
+    tsp6.print_brute_force()
 
-  if False:                       # see the search in action 
+  if False:
+    N = 10                        # N=9 brute force : 6 sec ; 10 : 3.5 min (mac laptop)
+    tspN = TSP(cities=N, tour='random')
+    start_time = time.clock()
+    tspN.print_brute_force()
+    print "elapsed time: %8.2f sec" % (time.clock() - start_time)
+
+  if False:                      # see the search in action 
     # This spits out a lot of text;
     # best send it to an output file with e.g.
     #   $ python tsp.py > tsp6.out
-    tsp.lk_verbose = True
-    tsp.LK()
+    tsp6.lk_verbose = True
+    tsp6.LK()
 
-  if True:                         # before/after 50 city picture
+  if False:                         # before/after 50 city picture
     print "-- TSP with 50 random cities --"
     tsp50 = TSP(cities=50, tour='random')
     graphname1 = 'random50_before.svg'
@@ -1117,15 +1166,48 @@ def main():
     tsp50.graph(graphname2, all_lines=False, scale=10)
 
   if False:                        # timing for various number of cities
-    format_numbers = " %4i   %5.2f   %8.2f   %8.2f "
-    format_strings = " %4s   %5s   %8s   %8s "
-    print format_strings % ('n', 'time', 'tour', 'lk_tour')
-    print format_strings % ('-'*4, '-'*5, '-'*8, '-'*8)
-    for n in (5, 10, 20, 40, 80, 160):
-      results = stats_random_tsp(n, 10)
-      print format_numbers % (n, results[0][0], results[1][0], results[2][0])
+    format_numbers = " %4i   %5.2f  +-%5.2f    %8.2f   %8.2f "
+    format_strings = " %4s   %5s  %7s    %8s   %8s "
+    print format_strings % ('n', 'time', 'sigma', 'tour', 'lk_tour')
+    print format_strings % ('-'*4, '-'*5, '-'*7, '-'*8, '-'*8)
+    for n in (5, 10, 20, 40, 80):
+      results = stats_random_tsp(n, 8)
+      print format_numbers % (n, results[0][0], results[0][1], results[1][0], results[2][0])
 
-if __name__ == "__main__":
-  doctest.testmod()
-  main()
+  if True:                         # timing for one big TSP
+    # Approx times on my mac laptop: N=100: 5sec; N=200: 44 sec; N=300: 200 sec
+    N = 300
+    print "-- TSP with %i random cities --" % N
+    t0 = time.clock()
+    tspN = TSP(cities=N, tour='random')
+    initial_length = tspN.tour_length()
+    t1 = time.clock()
+    print (" %.2f sec elapsed : original is " % (t1 - t0)) + str(tspN)
+    tspN.LK()
+    t2 = time.clock()
+    print (" %.2f sec elapsed : LK is " % (t2 - t1)) + str(tspN)
+
+# - - - generic doctest and running main - - - 
+
+#if __name__ == "__main__":
+#  doctest.testmod()
+#  main()
+
+# - - - code profile analysis  - - - - - - - 
+
+import cProfile
+cProfile.run('main()', 'profile_N300.out')
+#
+# To look at the profile dump,
+# see http://docs.python.org/library/profile.html e.g.
+#
+#   $ python
+#   > import pstats
+#   > p = pstats.Stats('profile_filename')
+#   > p.sort_stats('cumulative').print_stats(10)   # longest 10 functions
+#   # or
+#   > p.sort_stats('time').print_stats(10)
+#
+# Here "cumulative" is time spent in a function including sub calls,
+# while "time" is the time only in that function, not child calls.
 

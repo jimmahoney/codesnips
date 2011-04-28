@@ -1,0 +1,37 @@
+
+# -----------------------
+# with N=10 brute force ; profile to 'profile_brute10.out'
+$ python tsp.py
+
+-- brute force analysis of 10 cities with 181440 distinct tours --
+best is <Tour (10 roads, length 251.28): #10 - #14 - #9 - ... - #13 - #12 - #7 - #10>
+worst is <Tour (10 roads, length 573.24): #10 - #11 - #14 - ... - #12 - #9 - #13 - #10>
+elapsed time:   218.62 sec
+
+# ------------------------
+# statistics of profile dump
+$ python
+>>> import pstats
+>>> p = pstats.Stats('profile_brute10.out')
+>>> p.sort_stats('cumulative').print_stats(10)
+Thu Apr 28 01:02:02 2011    profile_brute10.out
+
+         65643600 function calls (65597335 primitive calls) in 218.649 CPU seconds
+
+   Ordered by: cumulative time
+   List reduced from 87 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  218.649  218.649 <string>:1(<module>)
+        1    1.506    1.506  218.649  218.649 tsp.py:1113(main)
+        1    1.376    1.376  217.137  217.137 tsp.py:857(print_brute_force)
+   362882   66.703    0.000  214.521    0.001 tsp.py:487(__init__)
+   362900    4.963    0.000  131.288    0.000 tsp.py:314(__init__)
+  3628996  120.833    0.000  124.976    0.000 tsp.py:325(update_cities)
+  3628952    3.040    0.000    7.744    0.000 tsp.py:362(get)
+   362883    1.317    0.000    4.844    0.000 tsp.py:264(__init__)
+  3991915    2.898    0.000    4.053    0.000 {method 'get' of 'dict' objects}
+ 25402824    3.786    0.000    3.786    0.000 tsp.py:144(__hash__)
+
+
+
