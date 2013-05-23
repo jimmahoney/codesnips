@@ -61,6 +61,9 @@ int data2[] = {1,1,0,  1,0,1,  0,1,0,  0,0,1};  // nrows=4, ncols=3
 
 int main(){
   solutions s;
+
+  tests();
+
   printf("-- dancing links simple samples ; see code for details. -- \n\n");
 
   printf("test case 1 - all solutions \n");

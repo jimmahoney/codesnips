@@ -44,11 +44,13 @@ struct _solutions {
 //                          1 => first; 0 => all up to DEFAULT_MAX_SOLUTIONS
 solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns);
 
-// Prints total number of solitions found,
+// Prints total number of solutions found,
 // and one line of row indices for each solution.
 void print_solutions(solutions s);
 
 // Print matrix of 1's and 0'2 from data[n_rows][n_cols]
 void print_data(int* data, int Nrows, int Ncols);
+
+void tests();
 
 #endif

@@ -67,11 +67,6 @@
  *
  */
 
-// FIXME : memory issues: 
-//  1. all the mallocs should fail gracefully if too much memory is requested.
-//  2. something wrong with free_nodes ... I've just commented out all free()'s (yuch)
-//  3. need a routine to free returned answeers.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "dancing_links.h"
@@ -106,6 +101,16 @@ node node_list_head = NULL;  // first in list of all created nodes
 node node_list_tail = NULL;  // last in list of all created nodes
 int node_list_count = 0;
 
+void* mymalloc(size_t size){
+  // malloc with simple return value check and (somewhat) graceful exit.
+  void* result = malloc(size);
+  if (result == NULL){
+    printf("ERROR : malloc could not allocate %lu bytes", (unsigned long) size);
+    exit(EXIT_FAILURE);
+  }
+  return result;
+}
+
 int is_root(node n){
   return (n->headcount == -2);
 }
@@ -116,15 +121,15 @@ int is_matrix(node n){
   return (n->headcount == -1);
 }
 node new_node(){
-  node n = (node) malloc(sizeof(struct _node));
+  node n = mymalloc(sizeof(struct _node));
   n->left = n->right = n->up = n->down = n->next = n->prev = n->header = NULL;
   n->row = n->col = n->headcount = -1;
   if (node_list_head == NULL){
-    node_list_head = n;
+    node_list_head = node_list_tail = n;
   }
   else {
     n->prev = node_list_tail;
-    node_list_tail->next = n;
+    n->prev->next = n;
   }
   node_list_tail = n;
   node_list_count++;
@@ -141,47 +146,28 @@ void print_node(char* message, node n){
   fflush(stdout);
 }
 void free_node(node n){
-  node prev = n->prev;
-  node next = n->next;
-  if (prev == NULL && next == NULL){
-    node_list_head = NULL;
-    node_list_tail = NULL;
-    node_list_count = 0;
-    // free(n);
-    return;
-  }
-  if (prev == NULL){
-    node_list_head = next;
-    node_list_head->prev = NULL;
-  } 
-  else {
-    prev->next = next;
-  }
-  if (next == NULL){
-    node_list_tail = prev;
-    node_list_tail->next = NULL;
-  } 
-  else {
-    next->prev = prev;
-  }
-  node_list_count--;
-  //free(n);
+  if (n == NULL) return;
+  if (n->left != NULL) n->left->right = n->right;
+  if (n->right != NULL) n->right->left = n->left;
+  if (n->up != NULL) n->up->down = n->down;
+  if (n->down != NULL) n->down->up = n->up;
+  if (n->prev != NULL) n->prev->next = n->next;
+  if (n->next != NULL) n->next->prev = n->prev;
+  if (node_list_head == n) node_list_head = n->next;
+  if (node_list_tail == n) node_list_tail = n->prev;
+  if (node_list_count > 0) node_list_count--;
+  free(n);
 }
-
 void free_all_nodes(){
   node n = node_list_head;
   node next;
   while (n != NULL){
     next = n->next;
-    // printf(" node count is now %i\n", node_list_count);
-    // print_node_prevnext("  free", n);
-    //
-    // free_node(n);   // FIXME
-    //   sometimes I'm getting this error :
-    //   malloc: *** error for object 0x100105540: 
-    //   incorrect checksum for freed object - object was probably modified after being freed.
-    //   At the moment I'm just not freeing up the node memory on exit...
-    //
+    if (DEBUG_PRINT){
+      printf(" node count is now %i\n", node_list_count);
+      print_node_prevnext("  freeing", n);
+    }
+    free_node(n);
     n = next;
   }
 }
@@ -357,19 +343,19 @@ void print_solutions(solutions s){
 }
 
 solution new_solution(int n_rows){
-  solution s = (solution) malloc(sizeof(struct _solution));
-  s->rows = (int*) malloc(n_rows*sizeof(int));
+  solution s = mymalloc(sizeof(struct _solution));
+  s->rows = mymalloc(n_rows*sizeof(int));
   s->i_rows = 0;
   return s;
 }
 
 solutions new_solutions(int max_solns, int n_rows){
   int i;
-  solutions ss = (solutions) malloc(sizeof(struct _solutions));
+  solutions ss = mymalloc(sizeof(struct _solutions));
   ss->max_solns = max_solns;
   ss->n_rows = n_rows;
   ss->i_solns = 0;  // solns->solutions[0] is current partial solution
-  ss->solns = (solution*) malloc(max_solns*sizeof(solution));
+  ss->solns = mymalloc(max_solns * sizeof(solution));
   ss->solns[0] = new_solution(n_rows);
   for (i = 1; i < max_solns; i++) ss->solns[i] = NULL;
   return ss;
@@ -457,9 +443,9 @@ node choose_column(node root){
 solution clone_solution(solution s){
   // Return a copy of a solution.
   int i;
-  solution s_clone = (solution) malloc(sizeof(struct _solution));
+  solution s_clone = (solution) mymalloc(sizeof(struct _solution));
   s_clone->i_rows = s->i_rows;
-  s_clone->rows = (int*) malloc(sizeof(s->rows));
+  s_clone->rows = (int*) mymalloc(sizeof(s->rows));
   for (i=0; i < s_clone->i_rows; i++) 
     s_clone->rows[i] = s->rows[i];
   return s_clone;
@@ -571,7 +557,7 @@ void grid_analysis(node root){
     } while (m != n);
     printf("\n");
   }
-  printf("  1s in grid = %i \n", in_grid);
+  printf("  1s in grid = %i \n\n", in_grid);
 }
 
 void search(node root, solutions ss, int depth){
@@ -687,18 +673,20 @@ void test_search(){
   print_solutions(solns);
 }
 
+void tests(){
+  node root;
+  test_reduce();     free_all_nodes();
+  test_node_list();  free_all_nodes();
+  root = new_test_grid(); print_grid(root); grid_analysis(root);
+  test_search();
+  printf("\n");
+}
+
 solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns){
   node root;
   solutions solns;
   if (max_solns == 0) max_solns = DEFAULT_MAX_SOLUTIONS;
 
-  // -- various tests --
-  // test_node_list();
-  // root = new_test_grid();
-  // print_grid(root);
-  // grid_analysis(root);
-  // test_reduce();
-  // test_search();
 
   solns = new_solutions(max_solns, n_rows);  
   root = new_grid(n_rows, n_cols, data);
