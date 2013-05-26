@@ -12,7 +12,7 @@
 void* _malloc(size_t bytes){
   void* result = malloc(bytes);
   if (result == NULL){
-    printf("*** FATAL ERROR in jims_utils.c : malloc(%lu) failed.\n", bytes);
+    printf("*** FATAL ERROR in jims_utils.c : malloc(%lu) failed.\n", (unsigned long) bytes);
     exit(EXIT_FAILURE);
   }
   return result;
