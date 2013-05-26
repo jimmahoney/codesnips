@@ -4,7 +4,7 @@
  */ 
 
 #include <stdio.h>
-#include "jims_utilities.h"
+#include "jims_utils.h"
 
 // On entry, in1[n1] and in2[n2] are already sorted.
 // On exit, out[n1+n2] has all the numbers in the correct order.

@@ -1,27 +1,38 @@
 
-CC=gcc -O2
+#dependencies
+U=../utilities
+INC = -I$(U)
 
-all: test_utilities test_merge time_merge
+CC = gcc
+
+ifdef DEBUG
+  OPT = -g -O0
+else
+  OPT = -O2
+endif
+
+all: test_merge time_merge
 
 clean:
-	rm *.o
+	rm -f *.o
 
-%.o: %.c
-	$(CC) -c $< -o $@
-# That confusing mumbo-jumbo just says to do this :
-#  foo.o : foo.c
-#        $(CC) -c foo.c -o foo.o
-# to make any *.o from a *.c ; see for example
-# http://www.gnu.org/software/make/manual/make.html#Pattern-Rules
+$(U)/jims_utils.o: 
+	cd $(U) ; make ; cd -
 
-test_utilities: jims_utilities.o test_utilities.o
-	$(CC) jims_utilities.o test_utilities.o -o test_utilities
+test_merge.o: test_merge.c 
+	$(CC) $(OPT) $(INC) test_merge.c -c -o test_merge.o
 
-test_merge: jims_utilities.o mergesort.o test_merge.o
-	$(CC) jims_utilities.o mergesort.o test_merge.o -o test_merge
+time_merge.o: time_merge.c 
+	$(CC) $(OPT) $(INC) time_merge.c -c -o time_merge.o
 
-time_merge: jims_utilities.o mergesort.o time_merge.o
-	$(CC) jims_utilities.o mergesort.o time_merge.o -o time_merge
+mergesort.o: mergesort.c
+	$(CC) $(OPT) $(INC) mergesort.c -c -o mergesort.o
+
+test_merge: mergesort.o test_merge.o $(U)/jims_utils.o 
+	$(CC) $(OPT) $(INC) $(U)/jims_utils.o mergesort.o test_merge.o -o test_merge
+
+time_merge: mergesort.o time_merge.o $(U)/jims_utils.o 
+	$(CC) $(OPT) $(INC) $(U)/jims_utils.o mergesort.o time_merge.o -o time_merge
 
 
 

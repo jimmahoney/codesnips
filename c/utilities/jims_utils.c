@@ -1,11 +1,26 @@
 /*
- * jims_utilities.c ; see jims_utilities.h
- */
+ * jims_utils.c
+ *
+ * see ./README & ./jims_utils.h
+ */ 
 
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "jims_utilities.h"
+#include "jims_utils.h"
+
+void* _malloc(size_t bytes){
+  void* result = malloc(bytes);
+  if (result == NULL){
+    printf("*** FATAL ERROR in jims_utils.c : malloc(%lu) failed.\n", bytes);
+    exit(EXIT_FAILURE);
+  }
+  return result;
+}
+
+void _free(void* ptr){
+  free(ptr);
+}
 
 clock_t ticks;
 int test_output = 0;  // 1 => print debug output

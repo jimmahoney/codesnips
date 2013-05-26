@@ -11,6 +11,7 @@
 #include <math.h>
 #include "queens.h"
 #include "dancing_links.h"
+#include "jims_utils.h"
 
 void print_an_answer(solutions answer, boards diags, int which){
   int row, col, i, soln;
@@ -63,13 +64,13 @@ int* make_matrix(boards diags){
   // int (*matrix)[n_cols] = (int (*)[n_cols]) malloc(n_rows*n_cols*sizeof(int));
   //  But the dancing_links code expects matrix to be just int*, 
   //  and in any case that seems simple and explicit.
-  int* matrix = (int *) malloc(n_rows*n_cols*sizeof(int));  
+  int* matrix = _malloc(n_rows * n_cols * sizeof(int));  
   board b = diags->first;
   for (row = 0; row < n_rows; row++){
     for (col = 0; col < n_cols; col++){
       q_row = col / n;
       q_col = col % n;
-      *(matrix + row*n_cols + col) = ((b->queens)[q_row] == q_col ? 1 : 0);
+      *(matrix + row * n_cols + col) = ((b->queens)[q_row] == q_col ? 1 : 0);
       // With the funkier declarations of matrix, that would be :
       //   matrix[row][col] = ((b->queens)[q_row] == q_col ? 1 : 0);
     }
@@ -90,20 +91,17 @@ void print_answer_perm(solutions answer, boards diags, int which){
 
 int main() {
   int n, n_diags_cols, n_diags_rows;
-  boards diags;
   int* matrix;
+  boards diags;
   solutions answer;
 
-  int low = 12;     // search limits
+  int low =   3;     // search limits  ( 3 <= low ; high <= 12 )
   int high = 12;
-
-  // FIXME : free memory for (solns, diags, matrix, answer) 
-  // and their interior components after each n.
 
   for (n=low; n<=high; n++){
     printf(" n=%i ", n);  fflush(stdout);
 
-    diags = queens_search_diagonal(n);
+    diags = queens_search_diagonals(n);
     printf("nqueens_diagonal=%i ", diags->count);  fflush(stdout);
 
     if (diags->count > n){
@@ -120,16 +118,13 @@ int main() {
 	printf("\n");
 	print_an_answer(answer, diags, 0);    // solution 0
       }
+
     }
     printf("\n");  fflush(stdout);
-    //free(matrix);
-    //free(solns);
-    //free(diags);
-    //free(answer);
-    //matrix = (int*) NULL;
-    //solns = (boards) NULL;
-    //diags = (boards) NULL;
-    //answer = (solutions) NULL;
+
+    free_boards(diags);
+    free_solutions(answer);
+    _free(matrix);
   }
   return 0;
 }

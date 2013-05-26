@@ -9,6 +9,7 @@
 #include <math.h>
 #include "queens.h"
 #include "dancing_links.h"
+#include "jims_utils.h"
 
 /* Return matrix[n_rows][n_cols] matrix of 1's and 0's 
    for the exact cover problem.  
@@ -30,7 +31,7 @@ int* make_matrix(boards diags){
   // int (*matrix)[n_cols] = (int (*)[n_cols]) malloc(n_rows*n_cols*sizeof(int));
   //  But the dancing_links code expects matrix to be just int*, 
   //  and in any case that seems simple and explicit.
-  int* matrix = (int *) malloc(n_rows*n_cols*sizeof(int));  
+  int* matrix = _malloc(n_rows*n_cols*sizeof(int));  
   board b = diags->first;
   for (row = 0; row < n_rows; row++){
     for (col = 0; col < n_cols; col++){

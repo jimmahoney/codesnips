@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "jims_utils.h"
 
 typedef struct _heapnode *heapnode;
 struct _heapnode {

@@ -19,8 +19,8 @@ int itmp;      // ditto
 // Assumes variable 'heap' is in scope; uses tmp and itmp.
 // (Yes, this looks ugly, but it's just tmp=a,a=b,b=tmp done twice.)
 //#define swap(i,j) (tmp=(heap->nodearray)[i], (heap->nodearray)[i]=(heap->nodearray)[j], (heap->nodearray)[j]=tmp, itmp=(heap->nodearray)[i]->index, (heap->nodearray)[i]->index=(heap->nodearray)[j]->index, (heap->nodearray)[j]->index=itmp)
-void swap(int i, int j, minheap heap){
-  //printf(" start swap; i,j=%i,%i \n", i,j);
+void swapem(int i, int j, minheap heap){
+  //printf(" start swapem; i,j=%i,%i \n", i,j);
   //print_minheap(heap);
   tmp = (heap->nodearray)[i]; 
   (heap->nodearray)[i] = (heap->nodearray)[j]; 
@@ -30,7 +30,7 @@ void swap(int i, int j, minheap heap){
   (heap->nodearray)[i]->index = (heap->nodearray)[j]->index; 
   (heap->nodearray)[j]->index = itmp;
   //print_minheap(heap);
-  //printf(" end swap\n");
+  //printf(" end swapem\n");
 }
 
 // indices of left,right children and parent of node i in heap array.
@@ -43,10 +43,10 @@ void swap(int i, int j, minheap heap){
 
 minheap new_minheap(int initsize){
   int i;
-  minheap heap = (minheap) malloc(sizeof(struct _minheap));
+  minheap heap = _malloc(sizeof(struct _minheap));
   heap->size = 0;
   heap->arraysize = initsize;
-  heap->nodearray = (heapnode*) malloc(sizeof(initsize * sizeof(heapnode)));
+  heap->nodearray = _malloc(sizeof(initsize * sizeof(heapnode)));
   //printf("in new_minheap; before NULLs\n");
   //print_minheap(heap);
   for (i=0; i<initsize; i++){
@@ -58,12 +58,12 @@ minheap new_minheap(int initsize){
 }
 
 heapnode new_heapnode(int key, char* name, void* data){
-  heapnode node = (heapnode) malloc(sizeof(struct _heapnode));
+  heapnode node = _malloc(sizeof(struct _heapnode));
   node->key = key;
   node->index = -1;
   if (name != NULL){
     // strings end with trailing 0, so need 1 byte more than length.
-    node->name = (char*) malloc(sizeof(strlen(name)) + 1);
+    node->name = _malloc(sizeof(strlen(name)) + 1);
     strcpy(node->name, name);
   }
   else {
@@ -78,14 +78,14 @@ void free_minheap(minheap heap){
   for (i=0; i < heap->size; i++){
     free_heapnode((heap->nodearray)[i]);
   }
-  free(heap);
+  _free(heap);
 }
 
 void free_heapnode(heapnode node){
   if (node->name != NULL){
-    free(node->name);
+    _free(node->name);
   }
-  free(node);
+  _free(node);
 }
 
 void bubbleup(minheap heap, int which){
@@ -95,7 +95,7 @@ void bubbleup(minheap heap, int which){
   int iparent = parent(inode);                // index of its parent.
   //printf("  in bubbleup: inode=%i, iparent=%i \n", inode, iparent);
   while (key(iparent) > key(inode)){
-    swap(inode, iparent, heap);
+    swapem(inode, iparent, heap);
     inode = iparent;
     iparent = parent(inode);
     //printf("  in bubbleup:  swapped; now inode=%i, iparent=%i \n", inode, iparent);    
@@ -120,7 +120,7 @@ void siftdown(minheap heap, int which){
     // Yes; swap with smaller of children.
     ismaller = key(ileft) <= key(iright) ? ileft : iright;
     //printf("  in siftdown; swapping %i and %i \n", inode, ismaller);
-    swap(inode, ismaller, heap);
+    swapem(inode, ismaller, heap);
     //printf("  in siftdown after swap \n");
     //print_minheap(heap);
     inode = ismaller;
@@ -175,7 +175,7 @@ heapnode popmin(minheap heap){
     //printf(" in popmin \n");
     //print_minheap(heap);
     heapnode minnode = heap->nodearray[0];                
-    swap(0, heap->size-1, heap);
+    swapem(0, heap->size-1, heap);
     heap->size--;
     //printf(" in popmin after bottom to top \n");
     //print_minheap(heap);

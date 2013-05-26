@@ -70,17 +70,20 @@ int main(){
   print_data((int*)data1, n_rows, n_cols);
   s = dancing_links(n_rows, n_cols, (int*)data1, 0);
   print_solutions(s);
+  free_solutions(s);
   printf("\n");
 
   printf("test case 2 - 1st solution \n");
   print_data(data2, 4, 3);
   s = dancing_links(4, 3, data2, 1);
   print_solutions(s);
+  free_solutions(s);
   printf("\n");
 
   printf("test case 2 - up to 3 solutions \n");
   s = dancing_links(4, 3, data2, 3);
   print_solutions(s);
+  free_solutions(s);
   printf("\n");
 
   return 0;

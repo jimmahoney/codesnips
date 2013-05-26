@@ -1,19 +1,30 @@
-CC=gcc -I/opt/local/include -I../permute -L/opt/local/lib -O2
+
+# dependencies
+P=../permute
+INC = -I$(P) 
+
+CC = gcc
+
+ifdef DEBUG
+  OPT = -g -O0
+else
+  OPT = -O2
+endif
 
 all: test
 
-test: test.o permute.o queens.o
-	$(CC) test.o permute.o queens.o -o test
+test: test.o $(P)/permute.o queens.o
+	$(CC) $(OPT) $(INC) test.o queens.o $(P)/permute.o -o test
 
-permute.o: ../permute/permute.c ../permute/permute.h
-	$(CC) -c ../permute/permute.c
+$(P)/permute.o: $(P)/permute.c $(P)/permute.h
+	cd $(P) ; make ; cd -
 
-queens.o: queens.c ../permute/permute.h queens.h
-	$(CC) -c queens.c
+queens.o: queens.h queens.c $(P)/permute.h
+	$(CC) $(OPT) $(INC) queens.c -c -o queens.o
 
-test.o: test.c ../permute/permute.h
-	$(CC) -c test.c
+test.o: test.c
+	$(CC) $(OPT) $(INC) test.c -c -o test.o
 
 clean:
-	rm *.o
+	rm -f *.o
 

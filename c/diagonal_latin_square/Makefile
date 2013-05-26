@@ -1,24 +1,46 @@
 
 # dependencies 
+U=../utilities
+P=../permute
 NQ=../n_queens
 DL=../dancing_links
-P=../permute
+INC = -I$(NQ) -I$(P) -I$(DL) -I$(U)
 
-CC=gcc -I/opt/local/include -I$(NQ) -I$(P) -I$(DL) -L/opt/local/lib -O2
+CC = gcc
+
+ifdef DEBUG
+  OPT = -g -O0 
+else
+  OPT = -O2 
+endif
+
+OBJS = $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o $(U)/jims_utils.o
 
 all: dls n_dls
 
+$(U)/jims_utils.o: 
+	cd $U; make; cd -
+
+$(P)/permute.o: 
+	cd $P; make; cd -
+
+$(NQ)/n_queens.o: 
+	cd $NQ; make; cd -
+
+$(DL)/dancing_links.o: 
+	cd $DL; make; cd -
+
 dls: dls.o $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o
-	$(CC) dls.o $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o -o dls
+	$(CC) $(OPT) $(INC) dls.o $(OBJS) -o dls
 
 dls.o: dls.c $(NQ)/queens.h $(DL)/dancing_links.h
-	$(CC) -c dls.c
+	$(CC) $(OPT) $(INC) -c dls.c
 
-n_dls: n_dls.o $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o
-	$(CC) n_dls.o $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o -o n_dls
+n_dls: n_dls.o $(P)/permute.o $(NQ)/queens.o $(DL)/dancing_links.o $(U)/jims_utils.o
+	$(CC) $(OPT) $(INC) n_dls.o $(OBJS) -o n_dls
 
 n_dls.o: n_dls.c $(NQ)/queens.h $(DL)/dancing_links.h
-	$(CC) -c n_dls.c
+	$(CC) $(OPT) $(INC) -c n_dls.c
 
 clean:
 	rm *.o

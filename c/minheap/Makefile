@@ -1,26 +1,34 @@
-#
-# based on example at
+# orginally based on an example at
 # http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
-#
 
-CC=gcc
+#dependencies
+U=../utilities
+INC = -I. -I$(U)
 
-# normal:
-CFLAGS=-O2 -I.
-# debug: 
-#CFLAGS=-O0 -g -I.
+CC = gcc
 
-DEPENDS = minheap.h
-OBJ = test_minheap.o minheap.o
+ifdef DEBUG
+  OPT = -g -O0
+else
+  OPT = -O2
+endif
+
+OBJ = test_minheap.o minheap.o $(U)/jims_utils.o
 
 all: test_minheap
 
 clean:
 	rm *.o
 
-%.o: %.c $(DEPENDS)
-	$(CC) $(CFLAGS) $< -c -o $@ 
+$U/jims_utils.o: 
+	cd $(U) ; make ; cd -
+
+minheap.o: minheap.h minheap.c 
+	$(CC) $(OPT) $(INC) -c minheap.c
+
+test_minheap.o: test_minheap.c minheap.h minheap.c
+	$(CC) $(OPT) $(INC) -c test_minheap.c
 
 test_minheap: $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ 
+	$(CC) $(OPT) $(INC) $(OBJ) -o test_minheap
 

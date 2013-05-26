@@ -70,6 +70,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dancing_links.h"
+#include "jims_utils.h"
 
 // 1 for diagnostic printing
 #define DEBUG_PRINT 0
@@ -101,16 +102,6 @@ node node_list_head = NULL;  // first in list of all created nodes
 node node_list_tail = NULL;  // last in list of all created nodes
 int node_list_count = 0;
 
-void* mymalloc(size_t size){
-  // malloc with simple return value check and (somewhat) graceful exit.
-  void* result = malloc(size);
-  if (result == NULL){
-    printf("ERROR : malloc could not allocate %lu bytes", (unsigned long) size);
-    exit(EXIT_FAILURE);
-  }
-  return result;
-}
-
 int is_root(node n){
   return (n->headcount == -2);
 }
@@ -121,7 +112,7 @@ int is_matrix(node n){
   return (n->headcount == -1);
 }
 node new_node(){
-  node n = mymalloc(sizeof(struct _node));
+  node n = _malloc(sizeof(struct _node));
   n->left = n->right = n->up = n->down = n->next = n->prev = n->header = NULL;
   n->row = n->col = n->headcount = -1;
   if (node_list_head == NULL){
@@ -156,7 +147,7 @@ void free_node(node n){
   if (node_list_head == n) node_list_head = n->next;
   if (node_list_tail == n) node_list_tail = n->prev;
   if (node_list_count > 0) node_list_count--;
-  free(n);
+  _free(n);
 }
 void free_all_nodes(){
   node n = node_list_head;
@@ -343,22 +334,34 @@ void print_solutions(solutions s){
 }
 
 solution new_solution(int n_rows){
-  solution s = mymalloc(sizeof(struct _solution));
-  s->rows = mymalloc(n_rows*sizeof(int));
+  solution s = _malloc(sizeof(struct _solution));
+  s->rows = _malloc(n_rows*sizeof(int));
   s->i_rows = 0;
   return s;
 }
 
+void free_solution(solution s){
+  _free(s->rows);
+  _free(s);
+}
+
 solutions new_solutions(int max_solns, int n_rows){
   int i;
-  solutions ss = mymalloc(sizeof(struct _solutions));
+  solutions ss = _malloc(sizeof(struct _solutions));
   ss->max_solns = max_solns;
   ss->n_rows = n_rows;
   ss->i_solns = 0;  // solns->solutions[0] is current partial solution
-  ss->solns = mymalloc(max_solns * sizeof(solution));
+  ss->solns = _malloc(max_solns * sizeof(solution));
   ss->solns[0] = new_solution(n_rows);
   for (i = 1; i < max_solns; i++) ss->solns[i] = NULL;
   return ss;
+}
+
+void free_solutions(solutions ss){
+  int i;
+  for (i = 0; i < ss->i_solns; i++) free_solution(ss->solns[i]);
+  _free(ss->solns);
+  _free(ss);
 }
 
 void reduce_grid(node n){
@@ -443,9 +446,9 @@ node choose_column(node root){
 solution clone_solution(solution s){
   // Return a copy of a solution.
   int i;
-  solution s_clone = (solution) mymalloc(sizeof(struct _solution));
+  solution s_clone = _malloc(sizeof(struct _solution));
   s_clone->i_rows = s->i_rows;
-  s_clone->rows = (int*) mymalloc(sizeof(s->rows));
+  s_clone->rows = _malloc(sizeof(s->rows));
   for (i=0; i < s_clone->i_rows; i++) 
     s_clone->rows[i] = s->rows[i];
   return s_clone;
