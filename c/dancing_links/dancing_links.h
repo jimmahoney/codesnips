@@ -20,8 +20,6 @@
  *
  */
 
-#define DEFAULT_MAX_SOLUTIONS 1000
-
 typedef struct _solution *solution;
 struct _solution {
   int i_rows;         // number of rows in this solution
@@ -31,17 +29,18 @@ struct _solution {
 typedef struct _solutions *solutions;
 struct _solutions {
   int n_rows;         // number of rows in original matrix = max solution size
-  int i_solns;        // number of solutions found = index of current partial
-  int max_solns;      // maximum number of solutions requested
-  solution* solns;    // (0..i_solns-1) complete; solns[i_solns] in progress
+  int found;          // number of complete solutions already found
+  int requested;      // number of solutions requested (0 => all)
+  int buffer_size;    // solns[buffer_size] is space currently allocated
+  solution* solns;    // solns[0] ... solns[found-1] are complete
+                      // solns[found] is partial solution in progress
 };
 
 // Solve a "complete cover" problem using the dancing links algorithm.
 // input: 
 //   n_row, n_cols        : data dimensions
 //   data[n_rows][n_cols] : matrix of 0's and 1's defining exact cover problem
-//   max_solns              maximum number of solutions to return;
-//                          1 => first; 0 => all up to DEFAULT_MAX_SOLUTIONS
+//   max_solns              max solutions to return (1 => first; 0 => all)
 solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns);
 
 // Prints total number of solutions found,

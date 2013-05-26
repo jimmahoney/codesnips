@@ -78,6 +78,9 @@
 // -1 for no printing; else print chosen row,col down to given search depth.
 #define PRINT_PROGRESS_DEPTH -1
 
+// amount to grow allocated number of solutions when space for more is needed.
+#define SOLN_BUFFER_INCREMENT 256
+
 // The nodes fall into three categories :
 //   one      root node      horizontal links to headers
 //                             headcount=-2; row=n_rows; col=n_cols
@@ -318,13 +321,12 @@ node new_grid(int n_rows, int n_cols, int* data){
   return root;
 }
 
-void print_solutions(solutions s){
+void print_solutions(solutions ss){
   int i,j;
   solution soln;
-  int i_solns = s->i_solns;
-  printf("Number of solutions found = %i ; rows :\n", i_solns);
-  for (i = 0; i < i_solns; i++){
-    soln = s->solns[i];
+  printf("Number of solutions found = %i ; rows :\n", ss->found);
+  for (i = 0; i < ss->found; i++){
+    soln = ss->solns[i];
     printf(" {%i", soln->rows[0]);
     for (j = 1; j < soln->i_rows; j++){
       printf(", %i", soln->rows[j]);
@@ -340,26 +342,61 @@ solution new_solution(int n_rows){
   return s;
 }
 
+solution clone_solution(solution s){
+  int i;
+  solution s_clone = _malloc(sizeof(struct _solution));
+  s_clone->i_rows = s->i_rows;
+  s_clone->rows = _malloc(s->i_rows * sizeof(int));
+  for (i=0; i < s->i_rows; i++) s_clone->rows[i] = s->rows[i];
+  return s_clone;
+}
+
 void free_solution(solution s){
   _free(s->rows);
   _free(s);
 }
 
-solutions new_solutions(int max_solns, int n_rows){
+solutions new_solutions(int n_rows, int max_solns){
   int i;
   solutions ss = _malloc(sizeof(struct _solutions));
-  ss->max_solns = max_solns;
   ss->n_rows = n_rows;
-  ss->i_solns = 0;  // solns->solutions[0] is current partial solution
-  ss->solns = _malloc(max_solns * sizeof(solution));
-  ss->solns[0] = new_solution(n_rows);
-  for (i = 1; i < max_solns; i++) ss->solns[i] = NULL;
+  ss->requested = max_solns;
+  ss->found = 0;
+  ss->buffer_size = ss->requested==0 ? SOLN_BUFFER_INCREMENT : ss->requested;
+  ss->solns = _malloc(sizeof(solution) * ss->buffer_size);
+  ss->solns[0] = new_solution(ss->n_rows);
+  for (i = 1; i < ss->buffer_size; i++) ss->solns[i] == NULL;
   return ss;
+}
+
+int found_requested_solutions(solutions ss){
+  return ss->requested != 0 && ss->found >= ss->requested;
+}
+
+void solution_found(solutions ss){
+  // Update solutions by incrementing count of solutions found,
+  // setting up space for the solution to be found (if still searching)
+  // and allocating more space for buffer if needed.
+  int i;
+  int old_buffer_size = ss->buffer_size;
+  solution* old_solns = ss->solns;
+  ss->found++;
+  if (found_requested_solutions(ss)) return;
+  if (ss->found+1 >= ss->buffer_size) ss->buffer_size += SOLN_BUFFER_INCREMENT;
+  if (ss->buffer_size != old_buffer_size){
+    // allocate new buffer and copy over old data.
+    ss->solns = _malloc(sizeof(solution) * ss->buffer_size);
+    for (i = 0; i < ss->found; i++) ss->solns[i] = old_solns[i];
+  }
+  // Setup next solution.
+  ss->solns[ss->found] = clone_solution(ss->solns[ss->found - 1]);
+  // Slots for future solutions should be empty.
+  for (i = ss->found + 1; i < ss->buffer_size; i++) ss->solns[i] == NULL;
 }
 
 void free_solutions(solutions ss){
   int i;
-  for (i = 0; i < ss->i_solns; i++) free_solution(ss->solns[i]);
+  for (i = 0; i < ss->found; i++) free_solution(ss->solns[i]);
   _free(ss->solns);
   _free(ss);
 }
@@ -441,22 +478,6 @@ node choose_column(node root){
     }
   }
   return column;
-}
-
-solution clone_solution(solution s){
-  // Return a copy of a solution.
-  int i;
-  solution s_clone = _malloc(sizeof(struct _solution));
-  s_clone->i_rows = s->i_rows;
-  s_clone->rows = _malloc(s->i_rows * sizeof(int));
-  for (i=0; i < s->i_rows; i++) 
-    s_clone->rows[i] = s->rows[i];
-  return s_clone;
-}
-
-int finished(solutions ss){
-  // Have we found as many solutions as were requested?
-  return ss->i_solns >= ss->max_solns;
 }
 
 void print_data(int* data, int Nrows, int Ncols){
@@ -566,7 +587,7 @@ void grid_analysis(node root){
 void search(node root, solutions ss, int depth){
   solution s;
   node n, column;
-  int i, i_solns, solution_row_index;
+  int i, solution_row_index;
   if (PRINT_PROGRESS_DEPTH >=0 && depth == 0){
     printf(" - dancing links search - printing (col, row) to depth %i - \n",
 	   PRINT_PROGRESS_DEPTH);
@@ -577,13 +598,8 @@ void search(node root, solutions ss, int depth){
     fflush(stdout);
   }
   if (root->right == root){
-    if (DEBUG_PRINT) printf(" -- solution found; cloning solution \n");
-    // If no columns remain, then we have a solution,
-    // so increment solution count and set up another
-    // in case we're looking for more.
-    ss->i_solns++;
-    i_solns = ss->i_solns;
-    ss->solns[i_solns] = clone_solution(ss->solns[i_solns-1]);
+    solution_found(ss);
+    if (DEBUG_PRINT) printf(" -- solution found\n");
   }
   else {
     // This is the heart of algorithm : 
@@ -605,7 +621,7 @@ void search(node root, solutions ss, int depth){
     if (DEBUG_PRINT) print_node("    -- first node in column = ", n);
     // For each remaining row in that column,
     // while we're still searching for solutions :
-    while (n != column && ! finished(ss)){
+    while (n != column && !found_requested_solutions(ss)){
       // if (DEBUG_PRINT) print_node("    -- trying node ", n);
       if (depth <= PRINT_PROGRESS_DEPTH) {
 	printf("    ");
@@ -615,7 +631,7 @@ void search(node root, solutions ss, int depth){
 	printf("\n");
       }
       // Push the row to the current partial solution.
-      s = ss->solns[ss->i_solns];
+      s = ss->solns[ss->found];
       s->rows[s->i_rows] = n->row;
       s->i_rows++;
       // Remove the selected node from the grid,
@@ -624,13 +640,15 @@ void search(node root, solutions ss, int depth){
       // progress report
       // Recursively search the smaller grid.
       search(root, ss, depth+1);
-      // Reverse the grid removals,
-      undo_reduce_grid(n);
-      // Pull the row from the partial solution.
-      s = ss->solns[ss->i_solns];  // (May have changed during search.)
-      s->i_rows--;
-      // Move on to the next row in this column.
-      n = n->down;
+      if (!found_requested_solutions(ss)){        // continue looking ?
+	// Reverse the grid removals,
+	undo_reduce_grid(n);
+	// Pull the row from the partial solution.
+	s = ss->solns[ss->found];  // (May have changed during search.)
+	s->i_rows--;
+	// Move on to the next row in this column.
+	n = n->down;
+      }
     }
   }
 }
@@ -686,13 +704,8 @@ void tests(){
 }
 
 solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns){
-  node root;
-  solutions solns;
-  if (max_solns == 0) max_solns = DEFAULT_MAX_SOLUTIONS;
-
-
-  solns = new_solutions(max_solns, n_rows);  
-  root = new_grid(n_rows, n_cols, data);
+  solutions solns = new_solutions(n_rows, max_solns);
+  node root = new_grid(n_rows, n_cols, data);
   search(root, solns, 0);
   free_all_nodes(); 
   return solns;
