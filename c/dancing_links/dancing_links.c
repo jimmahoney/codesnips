@@ -335,7 +335,7 @@ void print_solutions(solutions s){
 
 solution new_solution(int n_rows){
   solution s = _malloc(sizeof(struct _solution));
-  s->rows = _malloc(n_rows*sizeof(int));
+  s->rows = _malloc(n_rows * sizeof(int));
   s->i_rows = 0;
   return s;
 }
@@ -448,8 +448,8 @@ solution clone_solution(solution s){
   int i;
   solution s_clone = _malloc(sizeof(struct _solution));
   s_clone->i_rows = s->i_rows;
-  s_clone->rows = _malloc(sizeof(s->rows));
-  for (i=0; i < s_clone->i_rows; i++) 
+  s_clone->rows = _malloc(s->i_rows * sizeof(int));
+  for (i=0; i < s->i_rows; i++) 
     s_clone->rows[i] = s->rows[i];
   return s_clone;
 }
