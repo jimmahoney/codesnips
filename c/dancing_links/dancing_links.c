@@ -140,11 +140,12 @@ void print_node(char* message, node n){
   fflush(stdout);
 }
 void free_node(node n){
+  // This does *not* deal with links in the grid 
+  // (which may be funky anyway due to temporary removals);
+  // instead, remove_left_right and remove_up_down should 
+  // take care of grid links if need be.
+  // This only updates the node_list memory management prev/next stuff.
   if (n == NULL) return;
-  if (n->left != NULL) n->left->right = n->right;
-  if (n->right != NULL) n->right->left = n->left;
-  if (n->up != NULL) n->up->down = n->down;
-  if (n->down != NULL) n->down->up = n->up;
   if (n->prev != NULL) n->prev->next = n->next;
   if (n->next != NULL) n->next->prev = n->prev;
   if (node_list_head == n) node_list_head = n->next;

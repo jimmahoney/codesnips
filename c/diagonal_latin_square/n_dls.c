@@ -112,8 +112,8 @@ int main() {
       // printf("\n === enter dancing_links == \n"); fflush(stdout);
       answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
       // printf(" === leave dancing_links ==\n"); fflush(stdout);
-      printf("solns=%i ", answer->i_solns);  fflush(stdout);
-      if (answer->i_solns > 0){
+      printf("solns=%i ", answer->found);  fflush(stdout);
+      if (answer->found > 0){
 	//print_answer_perm(answer, diags, 0);
 	printf("\n");
 	print_an_answer(answer, diags, 0);    // solution 0
