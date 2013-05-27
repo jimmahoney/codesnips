@@ -385,9 +385,10 @@ void solution_found(solutions ss){
   if (found_requested_solutions(ss)) return;
   if (ss->found+1 >= ss->buffer_size) ss->buffer_size += SOLN_BUFFER_INCREMENT;
   if (ss->buffer_size != old_buffer_size){
-    // allocate new buffer and copy over old data.
+    // allocate new buffer, copy over old data, delete old buffer
     ss->solns = _malloc(sizeof(solution) * ss->buffer_size);
     for (i = 0; i < ss->found; i++) ss->solns[i] = old_solns[i];
+    _free(old_solns);
   }
   // Setup next solution.
   ss->solns[ss->found] = clone_solution(ss->solns[ss->found - 1]);
@@ -397,7 +398,11 @@ void solution_found(solutions ss){
 
 void free_solutions(solutions ss){
   int i;
-  for (i = 0; i < ss->found; i++) free_solution(ss->solns[i]);
+  for (i = 0; i < ss->buffer_size; i++){
+    if (ss->solns[i] != NULL){
+      free_solution(ss->solns[i]);
+    }
+  }
   _free(ss->solns);
   _free(ss);
 }
@@ -697,6 +702,7 @@ void test_search(){
 
 void tests(){
   node root;
+
   test_reduce();     
   free_all_nodes();
 
