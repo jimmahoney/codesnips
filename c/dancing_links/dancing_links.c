@@ -688,19 +688,28 @@ void test_reduce(){
 
 void test_search(){
   node root = new_test_grid();
-  solutions solns;
+  solutions ss = new_solutions(10, 10);
   printf(" -- testing search --\n");
-  solns = new_solutions(10, 10);
-  search(root, solns, 0);
-  print_solutions(solns);
+  search(root, ss, 0);
+  print_solutions(ss);
+  free_solutions(ss);
 }
 
 void tests(){
   node root;
-  test_reduce();     free_all_nodes();
-  test_node_list();  free_all_nodes();
-  root = new_test_grid(); print_grid(root); grid_analysis(root);
+  test_reduce();     
+  free_all_nodes();
+
+  test_node_list();  
+  free_all_nodes();
+
+  root = new_test_grid(); 
+  print_grid(root); 
+  grid_analysis(root);
+  free_all_nodes();
+
   test_search();
+
   printf("\n");
 }
 
