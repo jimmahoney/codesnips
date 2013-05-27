@@ -18,6 +18,15 @@ void* _malloc(size_t bytes){
   return result;
 }
 
+void* _calloc(size_t bytes){
+  void* result = calloc(bytes);
+  if (result == NULL){
+    printf("*** FATAL ERROR in jims_utils.c : calloc(%lu) failed.\n", (unsigned long) bytes);
+    exit(EXIT_FAILURE);
+  }
+  return result;
+}
+
 void _free(void* ptr){
   free(ptr);
 }

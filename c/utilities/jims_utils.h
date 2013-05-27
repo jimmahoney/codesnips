@@ -12,6 +12,7 @@
 // replacement for C's malloc()
 //   adds simple return value check and (somewhat) graceful error exit.
 void* _malloc(size_t bytes);
+void* _calloc(size_t bytes);
 
 // replacement for C's free()
 //   currently identical to original.
