@@ -234,15 +234,22 @@ node new_grid(int n_rows, int n_cols, int* data){
   // n_rows x n_cols grid as if all of data was a 1,
   // then remove all the ones where data is 0.
   node root, h, m, up, down, right, left;
-  node headers[n_cols];
-  node matrix[n_rows][n_cols];
   int row, col;
+
+  // Storage for the nodes while the links between them are being setup.
+  // This was on the stack, which caused problems as N got big.
+  //  node headers[n_cols];
+  //  node matrix[n_rows][n_cols];  // matrix[i][j] => matrix[i * n_cols + j]
+  node* headers = _malloc(n_cols * sizeof(node));
+  node* matrix = _malloc(n_rows * n_cols * sizeof(node));
+
   // create root node, vertically linked to itself
   root = new_node();
   root->headcount = -2;
   root->row = n_rows;
   root->col = n_cols;
   root->up = root->down = root;
+  if (DEBUG_PRINT) printf(" new_grid: \n");
   // create header nodes with headcount and column index.
   for (col = 0; col < n_cols; col++){
     h = headers[col] = new_node();
@@ -250,6 +257,7 @@ node new_grid(int n_rows, int n_cols, int* data){
     h->header = h;         // h is in its own column
     h->headcount = n_rows; // starting with full grid
   }
+  if (DEBUG_PRINT) printf(" new_grid: have headers \n");
   // link root horizontally to headers
   root->left = headers[n_cols-1];
   root->right = headers[0];
@@ -271,15 +279,17 @@ node new_grid(int n_rows, int n_cols, int* data){
     h->left = left;
     h->right = right;
   }
+  if (DEBUG_PRINT) printf(" new_grid: root linked to headers \n");
   // create matrix nodes with headers and indices
   for (col = 0; col < n_cols; col++){
     for (row = 0; row < n_rows; row++){
-      m = matrix[row][col] = new_node();
+      m = matrix[row * n_cols + col] = new_node();
       m->row = row;
       m->col = col;
       m->header = headers[col];
     }
   }
+  if (DEBUG_PRINT) printf(" new_grid: matrix nodes created \n");
   // link matrix nodes horizontally and vertically; headers at top
   for (col = 0; col < n_cols; col++){
     for (row = 0; row < n_rows; row++){
@@ -287,31 +297,31 @@ node new_grid(int n_rows, int n_cols, int* data){
 	up = headers[col];
       }
       else {
-	up = matrix[row-1][col];
+	up = matrix[(row-1) * n_cols + col];
       }
       if (row == n_rows-1){
 	down = headers[col];
       }
       else {
-	down = matrix[row+1][col];
+	down = matrix[(row+1) * n_cols + col];
       }
-      m = matrix[row][col];
+      m = matrix[row * n_cols + col];
       m->up = up;
       m->down = down;
-      m->left = matrix[row][(col+n_cols-1) % n_cols]; // in C, -1%n is -1.
-      m->right = matrix[row][(col+1) % n_cols];
+      m->left = matrix[row * n_cols + ((col+n_cols-1) % n_cols)]; // in C, -1%n is -1.
+      m->right = matrix[row * n_cols + ((col+1) % n_cols)];
     }
   }
   // link headers vertically
   for (col = 0; col < n_cols; col++){
-    headers[col]->down = matrix[0][col];
-    headers[col]->up = matrix[n_rows-1][col];
+    headers[col]->down = matrix[0 * n_cols + col];
+    headers[col]->up = matrix[(n_rows-1) * n_cols + col];
   }
   // delete matrix nodes where data is 0
   for (col = 0; col < n_cols; col++){
     for (row = 0; row < n_rows; row++){
       if (*(data + row*n_cols + col) == 0){
-	m = matrix[row][col];
+	m = matrix[row * n_cols + col];
 	// remove it from the grid and throw it away
 	remove_left_right(m);
 	remove_up_down(m);
@@ -319,6 +329,8 @@ node new_grid(int n_rows, int n_cols, int* data){
       }
     }
   }
+  _free(headers);
+  _free(matrix);
   return root;
 }
 
@@ -717,9 +729,13 @@ void tests(){
 }
 
 solutions dancing_links(int n_rows, int n_cols, int* data, int max_solns){
+  if (DEBUG_PRINT) printf(" dancing_links: debug \n");
   solutions solns = new_solutions(n_rows, max_solns);
+  if (DEBUG_PRINT) printf(" dancing_links: have solns \n");
   node root = new_grid(n_rows, n_cols, data);
+  if (DEBUG_PRINT) printf(" dancing_links: have grid \n");
   search(root, solns, 0);
+  if (DEBUG_PRINT) printf(" dancing_links: finished search \n");
   free_all_nodes(); 
   return solns;
 }

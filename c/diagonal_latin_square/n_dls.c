@@ -13,6 +13,10 @@
 #include "dancing_links.h"
 #include "jims_utils.h"
 
+#define SEARCH_LOW   12
+#define SEARCH_HIGH  12
+
+#define DEBUG_PRINT 0
 #define PRINT_NQUEEN_DIAGONALS 0
 #define PRINT_BOARDS 0
 
@@ -49,8 +53,8 @@ void print_an_answer(solutions answer, boards diags, int which){
 
 /* Return matrix[n_rows][n_cols] matrix of 1's and 0's 
    for the exact cover problem.  
-     n_cols = 64 : (row=0,col=0) (row=0,col=1) ...
-     n_rows = 48 : one for each 8-queens diagonal solution.
+     n_cols = n**2 (64 for n=8) : (row=0,col=0) (row=0,col=1) ...
+     n_rows = number of 8-queens diagonal solutions (48 for n=8)
    There's a 1 in the matrix if that solution has a queen
    at that row and column.   */
 int* make_matrix(boards diags){
@@ -67,6 +71,9 @@ int* make_matrix(boards diags){
   // int (*matrix)[n_cols] = (int (*)[n_cols]) malloc(n_rows*n_cols*sizeof(int));
   //  But the dancing_links code expects matrix to be just int*, 
   //  and in any case that seems simple and explicit.
+  if (DEBUG_PRINT)
+    printf(" matrix size in bytes is %lu \n", n_rows * n_cols * sizeof(int));
+  // for n=12, nqueen_diagonal_solns=9440, matrix size is 1359360 ints = 5437440 bytes ~ 5MB
   int* matrix = _malloc(n_rows * n_cols * sizeof(int));  
   board b = diags->first;
   for (row = 0; row < n_rows; row++){
@@ -93,27 +100,29 @@ void print_answer_perm(solutions answer, boards diags, int which){
 }
 
 int main() {
-
-  int low =   2;     // search limits
-  int high =  11;
-
   int i, j, n, n_diags_cols, n_diags_rows;
   int* matrix = NULL;
   boards diags = NULL;
   solutions answer = NULL;
 
   reset_timer();
-  for (n = low; n <= high; n++){
+  for (n = SEARCH_LOW; n <= SEARCH_HIGH; n++){
     printf(" n=%i ", n);  fflush(stdout);
     diags = queens_search_diagonals(n);
     printf("nqueens_diagonal=%i ", diags->count);  fflush(stdout);
     if (diags->count > n){
       n_diags_cols = pow(diags->first->n, 2);
       n_diags_rows = diags->count;
+      // printf("\n");
+      // printf(" diagonal solutions found : \n");
+      // print_boards_as_perms(diags);
+      // printf("\n == make_matrix == \n"); fflush(stdout);
       matrix = make_matrix(diags);
+
       // printf("\n === enter dancing_links == \n"); fflush(stdout);
       answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
       // printf(" === leave dancing_links ==\n"); fflush(stdout);
+
       printf("solns=%i \n", answer->found);  fflush(stdout);
       if (PRINT_NQUEEN_DIAGONALS){ 
 	print_boards_as_perms(diags);

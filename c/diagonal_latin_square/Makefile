@@ -43,5 +43,5 @@ n_dls.o: n_dls.c $(NQ)/queens.h $(DL)/dancing_links.h
 	$(CC) $(OPT) $(INC) n_dls.c -c -o n_dls.o
 
 clean:
-	rm *.o
+	rm -f *.o
 
