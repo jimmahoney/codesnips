@@ -1,7 +1,8 @@
 
 # dependencies
 P=../permute
-INC = -I$(P) 
+U=../utilities
+INC = -I$(P) -I$(U)
 
 CC = gcc
 
@@ -13,13 +14,16 @@ endif
 
 all: test
 
-test: test.o $(P)/permute.o queens.o
-	$(CC) $(OPT) $(INC) test.o queens.o $(P)/permute.o -o test
-
 $(P)/permute.o: $(P)/permute.c $(P)/permute.h
 	cd $(P) ; make ; cd -
 
-queens.o: queens.h queens.c $(P)/permute.h
+$(U)/jims_utils.o: $(U)/jims_utils.c $(U)/jims_utils.h 
+	cd $(U) ; make ; cd -
+
+test: test.o queens.o $(P)/permute.o $(U)/jims_utils.o 
+	$(CC) $(OPT) $(INC) test.o queens.o $(P)/permute.o $(U)/jims_utils.o -o test
+
+queens.o: queens.h queens.c $(P)/permute.h $(U)/jims_utils.h 
 	$(CC) $(OPT) $(INC) queens.c -c -o queens.o
 
 test.o: test.c

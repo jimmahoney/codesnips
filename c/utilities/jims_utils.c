@@ -9,26 +9,37 @@
 #include <stdlib.h>
 #include "jims_utils.h"
 
+int allocation_count = 0;
+
 void* _malloc(size_t bytes){
   void* result = malloc(bytes);
   if (result == NULL){
-    printf("*** FATAL ERROR in jims_utils.c : malloc(%lu) failed.\n", (unsigned long) bytes);
+    printf("*** FATAL ERROR in jims_utils.c : malloc(%lu) failed.\n", 
+	   (unsigned long) bytes);
     exit(EXIT_FAILURE);
   }
+  allocation_count++;
   return result;
 }
 
-void* _calloc(size_t bytes){
-  void* result = calloc(bytes);
+void* _calloc(size_t num, size_t size){
+  void* result = calloc(num, size);
   if (result == NULL){
-    printf("*** FATAL ERROR in jims_utils.c : calloc(%lu) failed.\n", (unsigned long) bytes);
+    printf("*** FATAL ERROR in jims_utils.c : calloc(%lu, %lu) failed.\n", 
+	   (unsigned long) num, (unsigned long) size);
     exit(EXIT_FAILURE);
   }
+  allocation_count++;
   return result;
 }
 
 void _free(void* ptr){
+  allocation_count--;
   free(ptr);
+}
+
+int get_allocation_count(){
+  return allocation_count;
 }
 
 clock_t ticks;

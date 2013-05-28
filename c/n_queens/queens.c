@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include "queens.h"
 #include "permute.h"
+#include "jims_utils.h"
+
+#define MAX_BOARD_SIZE 20
 
 // Return true if there's a queen at the given row and column.
 #define queen_at(queens, row, column) ((queens)[(row)] == (column))
@@ -15,30 +18,20 @@ int is_queen(board b, int row, int column){
 }
 
 board new_board(int n){
-  board b = (board) malloc(sizeof(struct _board));
-  int* queens = (int*) malloc(n*sizeof(int));
+  board b = _malloc(sizeof(struct _board));
+  int* queens = _malloc(n * sizeof(int));
   int i;
-  for (i=0; i<n; i++) queens[i] = 0;
+  for (i = 0; i < n; i++) queens[i] = 0;
   b->n = n;
   b->queens = queens;
   b->next = NULL;
   return b;
 }
 void free_board(board b){
-  if (b==NULL) return;
-  free(b->queens);
-  free(b);
+  if (b == NULL) return;
+  _free(b->queens);
+  _free(b);
 }
-
-// void queens2int(board b){
-//   int j;
-//   int m = 1;
-//   b->queensint = 0;
-//   for (j=0; j < b->n; j++){
-//     b->queensint += b->queens[j] * m;
-//     m *= b->n;
-//   }
-// }
 
 board new_board_from_queens(int n, int* queens){
   board b = new_board(n);
@@ -48,22 +41,22 @@ board new_board_from_queens(int n, int* queens){
 }
 
 boards new_boards(){
-  boards bs = (boards) malloc(sizeof(struct _boards));
+  boards bs = _malloc(sizeof(struct _boards));
   bs->count = 0;
   bs->first = NULL;
   bs->last = NULL;
   return bs;
 }
 void free_boards(boards bs){
-  board next;
+  board b, next;
   if (bs == NULL) return;
-  board b = bs->first;
+  b = bs->first;
   while (b != NULL){
     next = b->next;
     free_board(b);
     b = next;
   }
-  free(bs);
+  _free(bs);
 }
 
 void append(boards bs, int n, int* queens){
@@ -89,8 +82,7 @@ int ok_diagonal(int n, int* queens,
   int queens_seen = 0;
   do {
     if (queen_at(queens, row, column)){
-      if (queens_seen > 0) 
-	return 0;
+      if (queens_seen > 0) return 0;
       queens_seen++;
     }
     row += delta_row;
@@ -169,11 +161,11 @@ void print_board(board b){
 }
 
 void print_boards(boards bs){
+  board b;
   if (bs->count == 0){
     printf(" none\n");
   }
   else {
-    board b;
     printf("%i boards :\n", bs->count);
     if (bs->count > 0){
       b = bs->first;
@@ -188,9 +180,9 @@ void print_boards(boards bs){
 
 board nth_board(boards bs, int n){
   // return n'th board from list
-  if (bs->count == 0) return (board) NULL;
   board b = bs->first;
   int i = 0;
+  if (bs->count == 0) return NULL;
   while (i < n){
     b = b->next;
     i++;
@@ -209,12 +201,12 @@ void print_board_as_perm(board b){
 }
 
 void print_boards_as_perms(boards bs){
+  int i = 0;
+  board b = bs->first;
   if (bs->count == 0){
     printf(" none\n");
   }
   else {
-    int i = 0;
-    board b = bs->first;
     while (b != NULL){
       printf(" %3i ", i);
       print_board_as_perm(b);
@@ -224,11 +216,12 @@ void print_boards_as_perms(boards bs){
   }
 }
 
+int totals[MAX_BOARD_SIZE][MAX_BOARD_SIZE];
+
 void print_queens_per_square(boards solutions){
   board b;
   int i,j;
   int n = solutions->first->n;
-  int totals[8][8];
   for (i=0; i<n; i++){
     for (j=0; j<n; j++){
       totals[i][j] = 0;

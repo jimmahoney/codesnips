@@ -10,7 +10,7 @@
 
 // Loop over all permutations of integers 0..(n-1), 
 // calling func(int n, int* permutation) on each.
-void permute(int n, void (*func)());
+void permute(int n, void (*func)(int, int*));
 
 #endif
 

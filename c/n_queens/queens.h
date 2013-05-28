@@ -35,7 +35,6 @@ typedef struct _board *board;
 struct _board {
   int n;         /* board size */
   int* queens;   /* queens[n] are 0..n-1 = index of column with queen */
-  // int queensint; /* queens array as an integer, for ordering/set stuff */
   board next;
 };
 

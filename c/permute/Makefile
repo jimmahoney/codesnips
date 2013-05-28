@@ -1,5 +1,8 @@
 
+U=../utilities
+
 CC = gcc
+INC = -I$(U)
 
 ifdef DEBUG
   OPT = -g -O0 
@@ -12,12 +15,15 @@ all: test
 clean:
 	rm *.o
 
-test: test.o permute.o
-	$(CC) $(OPT) test.o permute.o -o test
+$(U)/jims_utils.o:
+	cd $(U) ; make ; cd -
 
-test.o: test.c permute.h
-	$(CC) $(OPT) -c test.c
+test: test.o permute.o $(U)/jims_utils.o
+	$(CC) $(OPT) $(INC) test.o permute.o $(U)/jims_utils.o -o test
 
-permute.o: permute.c permute.h
-	$(CC) $(OPT) -c permute.c
+test.o: test.c permute.h $(U)/jims_utils.h 
+	$(CC) $(OPT) $(INC) test.c -c -o test.o
+
+permute.o: permute.c permute.h $(U)/jims_utils.h 
+	$(CC) $(OPT) $(INC) permute.c -c -o permute.o
 
