@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include "jims_utils.h"
 
+#define UTIL_DEBUG 0
+
 int allocation_count = 0;
 
 void* _malloc(size_t bytes){
@@ -19,23 +21,29 @@ void* _malloc(size_t bytes){
     exit(EXIT_FAILURE);
   }
   allocation_count++;
+  if (UTIL_DEBUG) printf("  _malloc returns %p ; blocks allocated is now %i \n",
+			 result, allocation_count);
   return result;
 }
 
 void* _calloc(size_t num, size_t size){
   void* result = calloc(num, size);
   if (result == NULL){
-    printf("*** FATAL ERROR in jims_utils.c : calloc(%lu, %lu) failed.\n", 
+    printf("*** FATAL ERROR in jims_utils.c : calloc(%lu, %lu) failed.\n",
 	   (unsigned long) num, (unsigned long) size);
     exit(EXIT_FAILURE);
   }
   allocation_count++;
+  if (UTIL_DEBUG) printf("  _calloc returns %p ; blocks allocated is now %i \n",
+			 result, allocation_count);
   return result;
 }
 
 void _free(void* ptr){
-  allocation_count--;
   free(ptr);
+  allocation_count--;
+  if (UTIL_DEBUG) printf("  _free'd %p ; blocks allocated is now %i \n", 
+			 ptr, allocation_count);
 }
 
 int get_allocation_count(){

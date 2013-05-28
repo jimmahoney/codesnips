@@ -42,18 +42,18 @@ void swapem(int i, int j, minheap heap){
 #define HEAP_ARRAY_INCREMENT_SIZE 100
 
 minheap new_minheap(int initsize){
-  int i;
+  // int i;
   minheap heap = _malloc(sizeof(struct _minheap));
   heap->size = 0;
   heap->arraysize = initsize;
-  heap->nodearray = _malloc(sizeof(initsize * sizeof(heapnode)));
-  //printf("in new_minheap; before NULLs\n");
-  //print_minheap(heap);
-  for (i=0; i<initsize; i++){
-    heap->nodearray[i] = NULL;
-  }
-  //printf("in new_minheap; after NULLs\n");
-  //print_minheap(heap);
+  heap->nodearray = _calloc(initsize, sizeof(heapnode));
+  // printf("in new_minheap; before NULLs\n");
+  // print_minheap(heap);
+  // for (i=0; i<initsize; i++){
+  //  heap->nodearray[i] = NULL;
+  // }
+  // printf("in new_minheap; after NULLs\n");
+  // print_minheap(heap);
   return heap;
 }
 
@@ -78,6 +78,7 @@ void free_minheap(minheap heap){
   for (i=0; i < heap->size; i++){
     free_heapnode((heap->nodearray)[i]);
   }
+  _free(heap->nodearray);
   _free(heap);
 }
 

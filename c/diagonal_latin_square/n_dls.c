@@ -90,24 +90,22 @@ void print_answer_perm(solutions answer, boards diags, int which){
 }
 
 int main() {
-  int n, n_diags_cols, n_diags_rows;
-  int* matrix;
-  boards diags;
-  solutions answer;
 
-  int low =   3;     // search limits  ( 3 <= low ; high <= 12 )
-  int high = 12;
+  int low =   2;     // search limits
+  int high =  12;
+
+  int n, n_diags_cols, n_diags_rows;
+  int* matrix = NULL;
+  boards diags = NULL;
+  solutions answer = NULL;
 
   for (n=low; n<=high; n++){
     printf(" n=%i ", n);  fflush(stdout);
-
     diags = queens_search_diagonals(n);
     printf("nqueens_diagonal=%i ", diags->count);  fflush(stdout);
-
     if (diags->count > n){
       n_diags_cols = pow(diags->first->n, 2);
       n_diags_rows = diags->count;
-
       matrix = make_matrix(diags);
       // printf("\n === enter dancing_links == \n"); fflush(stdout);
       answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
@@ -118,13 +116,11 @@ int main() {
 	printf("\n");
 	print_an_answer(answer, diags, 0);    // solution 0
       }
-
+      _free(matrix);
+      free_solutions(answer);
     }
     printf("\n");  fflush(stdout);
-
     free_boards(diags);
-    free_solutions(answer);
-    _free(matrix);
   }
   return 0;
 }

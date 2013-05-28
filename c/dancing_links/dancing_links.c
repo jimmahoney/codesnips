@@ -364,7 +364,7 @@ solutions new_solutions(int n_rows, int max_solns){
   ss->requested = max_solns;
   ss->found = 0;
   ss->buffer_size = ss->requested==0 ? SOLN_BUFFER_INCREMENT : ss->requested;
-  ss->solns = _calloc(sizeof(solution) * ss->buffer_size);
+  ss->solns = _calloc(ss->buffer_size, sizeof(solution));
   ss->solns[0] = new_solution(ss->n_rows);
   return ss;
 }
@@ -385,7 +385,7 @@ void solution_found(solutions ss){
   if (ss->found+1 >= ss->buffer_size) ss->buffer_size += SOLN_BUFFER_INCREMENT;
   if (ss->buffer_size != old_buffer_size){
     // allocate new buffer, copy over old data, delete old buffer
-    ss->solns = _calloc(sizeof(solution) * ss->buffer_size);
+    ss->solns = _calloc(ss->buffer_size, sizeof(solution));
     for (i = 0; i < ss->found; i++) ss->solns[i] = old_solns[i];
     _free(old_solns);
   }

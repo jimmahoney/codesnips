@@ -86,5 +86,8 @@ int main(){
   free_solutions(s);
   printf("\n");
 
+  printf("memory check:\n");
+  printf(" malloc() + calloc() - free() = %i \n\n", get_allocation_count());
+
   return 0;
 }

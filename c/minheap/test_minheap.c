@@ -20,7 +20,7 @@ int main(){
   minheap heap; 
 
   printf("creating nodes\n");
-  for (i=0; i<N; i++){
+  for (i = 0; i < N; i++){
     nodes[i] = new_heapnode(priorities[i], names[i], NULL);
     print_heapnode(nodes[i]);
   }
@@ -28,7 +28,7 @@ int main(){
 
   printf("building the heap.\n");
   heap = new_minheap(16);
-  for (i=0; i<N; i++){
+  for (i = 0; i < N; i++){
     printf("  adding i=%i : \n", i);
     add(nodes[i], heap);
     print_minheap(heap);
@@ -44,9 +44,13 @@ int main(){
   while (heap->size > 0){
     node = popmin(heap);
     print_heapnode(node);
+    free_heapnode(node);
   }
+  free_minheap(heap);
   printf("\n");
 
-  printf("done\n");
+  printf("memory check:\n");
+  printf(" malloc() + calloc() - free() = %i \n\n", get_allocation_count());
+
   return 0;
 }
