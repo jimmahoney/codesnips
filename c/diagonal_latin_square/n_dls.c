@@ -13,34 +13,37 @@
 #include "dancing_links.h"
 #include "jims_utils.h"
 
+#define PRINT_NQUEEN_DIAGONALS 0
+#define PRINT_BOARDS 0
+
 void print_an_answer(solutions answer, boards diags, int which){
   int row, col, i, soln;
   board b;
   int n = diags->first->n;
+  char symbol;
   printf("  +");
-  for (col=0; col<n; col++) printf("--");
+  for (col = 0; col < n; col++) printf("--");
   printf("-+\n");
   // printf("  |");
   // for (col=0; col<n; col++) printf("  ");  
   // printf(" |\n");
-  for (row=0; row<n; row++){
+  for (row = 0; row < n; row++){
     printf("  |");
-    for (col=0; col<n; col++){
-      for (i=0; i<n; i++){
+    for (col = 0; col < n; col++){
+      for (i = 0; i < n; i++){
 	soln = answer->solns[which]->rows[i]; // which solution in diags
 	b = nth_board(diags, soln);
 	if ((b->queens)[row]==col){
-	  printf(" %c", (char) (i + (int)'A'));
+	  // choose symbols so that first row is (A B C ...)
+	  symbol = (char) ((b->queens)[0] + (int)'A');
+	  printf(" %c", symbol);
 	}
       }
     }
     printf(" |\n");
-    // printf("  |");
-    // for (col=0; col<n; col++) printf("  ");  
-    // printf(" |\n");
   }
   printf("  +");
-  for (col=0; col<n; col++) printf("--");
+  for (col = 0; col < n; col++) printf("--");
   printf("-+\n\n");
 }
 
@@ -92,14 +95,15 @@ void print_answer_perm(solutions answer, boards diags, int which){
 int main() {
 
   int low =   2;     // search limits
-  int high =  12;
+  int high =  11;
 
-  int n, n_diags_cols, n_diags_rows;
+  int i, j, n, n_diags_cols, n_diags_rows;
   int* matrix = NULL;
   boards diags = NULL;
   solutions answer = NULL;
 
-  for (n=low; n<=high; n++){
+  reset_timer();
+  for (n = low; n <= high; n++){
     printf(" n=%i ", n);  fflush(stdout);
     diags = queens_search_diagonals(n);
     printf("nqueens_diagonal=%i ", diags->count);  fflush(stdout);
@@ -110,17 +114,31 @@ int main() {
       // printf("\n === enter dancing_links == \n"); fflush(stdout);
       answer = dancing_links(n_diags_rows, n_diags_cols, matrix, 0);
       // printf(" === leave dancing_links ==\n"); fflush(stdout);
-      printf("solns=%i ", answer->found);  fflush(stdout);
-      if (answer->found > 0){
-	//print_answer_perm(answer, diags, 0);
+      printf("solns=%i \n", answer->found);  fflush(stdout);
+      if (PRINT_NQUEEN_DIAGONALS){ 
+	print_boards_as_perms(diags);
 	printf("\n");
-	print_an_answer(answer, diags, 0);    // solution 0
+      }
+      if (answer->found > 0){
+	for (i = 0; i < answer->found; i++){
+	  if (PRINT_NQUEEN_DIAGONALS){
+	    printf("  ("); // print which diagonal solutions are in this answer
+	    for (j= 0; j < n; j++) printf("%i ", answer->solns[i]->rows[j]);
+	    printf(")\n");
+	  }
+	  if (PRINT_BOARDS) print_an_answer(answer, diags, i);
+	}
       }
       _free(matrix);
       free_solutions(answer);
     }
-    printf("\n");  fflush(stdout);
+    else {
+      printf("\n");
+    }
     free_boards(diags);
   }
+  printf(" elapsed time ");
+  print_elapsed();
+  printf("\n");
   return 0;
 }

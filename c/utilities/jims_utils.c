@@ -61,6 +61,24 @@ float elapsed_time(){
   return (clock() - ticks) * 1.0 / CLOCKS_PER_SEC;
 }
 
+void print_elapsed(){
+  double elapsed = elapsed_time();
+  double sec;
+  int day, hour, min;
+  day = (int) (elapsed / (24*60*60));
+  elapsed -= 24*60*60 * day;
+  hour = (int) (elapsed / (60*60));
+  elapsed -= 60*60 * hour;
+  min = (int) (elapsed / 60);
+  sec = elapsed - (60 * min);
+  if (day == 0){
+    printf("%02i:%02i:%06.3f", hour, min, sec);
+  }
+  else {
+    printf("%i:%02i:%02i:%06.3f", day, hour, min, sec);
+  }
+}
+
 void print_array(int n, int array[]){
   // Print array[0,...(n-1)], followed by a newline.
   int i;

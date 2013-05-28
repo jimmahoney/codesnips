@@ -26,6 +26,7 @@ void print_array(int n, int array[]);   // array[n] as e.g. "[1, 2, 4,]\n"
 
 void reset_timer();
 float elapsed_time();                   // seconds since last reset_timer()
+void print_elapsed();                   // print elapsed_time() as "d:hh:mm:ss.sss"
 
 int random_int(int min, int max);       // min <= random_int <= max
 void random_ints(int n, int numbers[]); // integers 1..n in random order.

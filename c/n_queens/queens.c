@@ -222,14 +222,14 @@ void print_queens_per_square(boards solutions){
   board b;
   int i,j;
   int n = solutions->first->n;
-  for (i=0; i<n; i++){
-    for (j=0; j<n; j++){
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++){
       totals[i][j] = 0;
     }
   }
   // printf("working ");
-  for (i=0; i<n; i++){
-    for (j=0; j<n; j++){
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++){
       // printf("."); fflush(stdout);
       b = solutions->first;
       while (b != NULL){
@@ -238,8 +238,8 @@ void print_queens_per_square(boards solutions){
       }
     }
   }
-  for (i=0; i<n; i++){
-    for (j=0; j<n; j++){
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++){
       printf(" %4i", totals[i][j]);
     }
     printf("\n");
@@ -273,17 +273,21 @@ void queens_diagonal_permutation(int n, int* queens){
 
 boards queens_search_diagonals(int n){
   // return solutions to n-queens with queens on both long diagonals
-  solutions = new_boards();
+  boards result;
+  n_permutations = 0;
+  solutions = result = new_boards();
   permute(n, &queens_diagonal_permutation);
-  return solutions;
+  solutions = NULL;
+  return result;
 }
 
 boards queens_search(int n){
   // return solutions to n-queens problem.
+  boards result;
   n_permutations = 0;
-  solutions = new_boards();
+  solutions = result = new_boards();
   permute(n, &queens_permutation);
   // printf("searched %i permutations.\n", n_permutations);
-  return solutions;
+  solutions = NULL;
+  return result;
 }
-

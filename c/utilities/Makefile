@@ -15,9 +15,9 @@ clean:
 test: test.o jims_utils.o
 	$(CC) $(OPT) test.o jims_utils.o -o test
 
-jims_utils.o:
+jims_utils.o: jims_utils.c jims_utils.h
 	$(CC) $(OPT) jims_utils.c -c -o jims_utils.o
 
 test.o: test.c jims_utils.h
-	$(CC) $(OPT) -c test.c
+	$(CC) $(OPT) test.c -c -o test.o
 

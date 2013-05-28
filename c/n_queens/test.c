@@ -10,14 +10,6 @@
 #include "queens.h"
 #include "jims_utils.h"
 
-void print_elapsed(){
-  double elapsed = elapsed_time();
-  int hour = (int) (elapsed / 3600);
-  int min = (int) (elapsed - hour*3600)/60;
-  double sec = elapsed - hour*3600 - min*60;
-  printf("%02i:%02i:%06.3f", hour, min, sec);
-}
-
 int main() {
   int good_queens[] = {4, 1, 3, 5, 7, 2, 0, 6};
   int bad_queens[] = {4, 3, 1, 5, 7, 2, 0, 6};
