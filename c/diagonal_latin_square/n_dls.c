@@ -13,12 +13,12 @@
 #include "dancing_links.h"
 #include "jims_utils.h"
 
-#define SEARCH_LOW   12
+#define SEARCH_LOW    3
 #define SEARCH_HIGH  12
 
 #define DEBUG_PRINT 0
-#define PRINT_NQUEEN_DIAGONALS 0
-#define PRINT_BOARDS 0
+#define PRINT_NQUEEN_DIAGONALS 1
+#define PRINT_BOARDS 1
 
 void print_an_answer(solutions answer, boards diags, int which){
   int row, col, i, soln;

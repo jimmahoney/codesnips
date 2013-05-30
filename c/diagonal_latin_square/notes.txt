@@ -228,6 +228,11 @@ I'm not quitting cleanly right now when that happens ... another thing to fix.
 Something wrong with the freeing memory I'm doing in dancing_links.c;
 for now I've just done the kludgey thing of not freeing any memory.  (Ugh.)
 
+May 29-31 2013 :
+ 15 hours on sci.marlboro.edu gave
+ n=12 nqueens_diagonal=9440 solns=454 
 
+ re-ran with more printing to save all n_queen diagonal solutions
+ and print the boards ; saved to n_dls.out_3-12
 
 
