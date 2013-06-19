@@ -54,10 +54,10 @@ int main() {
   free_boards(diagonals);
 
   printf("==== queens_search_diagonals for various n ====\n", n);
-  for (n=4; n<11; n++){
+  for (n=4; n<15; n++){
     reset_timer();
     diagonals = queens_search_diagonals(n);
-    printf(" n = %2i ; count = %5i ; time = ", n, diagonals->count);
+    printf(" n = %2i ; count = %7i ; time = ", n, diagonals->count);
     print_elapsed(); printf("\n"); fflush(stdout);
     free_boards(diagonals);
   }

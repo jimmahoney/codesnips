@@ -134,7 +134,8 @@ boards in_both_diagonals(boards solutions){
   // given a list of boards, return the subset with queens in both diagonals */
   boards diags = new_boards();
   board b = solutions->first;
-  int n = b->n;
+  int n = 0;
+  if (b != NULL) n = b->n;
   while (b != NULL){
     if (queen_in_1st_diagonal(b->n, b->queens) && 
 	queen_in_2nd_diagonal(b->n, b->queens))
